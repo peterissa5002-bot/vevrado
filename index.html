@@ -1,0 +1,1196 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vevrado</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Vevrado, matériel de sport.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Marcellus&display=swap">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+/* Layout: one fixed screen moved step by step: logo, column of letters and products, then each product with the column pinned at the right. */
+:root {
+  --cream: #FEFAF4; --paper: #EFE9DA; --sand: #BAA88C; --sand-soft: #DCD0BA;
+  --error: #9A4A32;
+  --light-core: #FFFDF7; --light: rgba(190,170,138,.95); --light-soft: rgba(190,170,138,.5);
+  --olive: #71775C; --moss: #4F573F; --ink: #33392A; --muted: #666C55;
+  --display: "Marcellus", "Times New Roman", serif;
+  --body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --step: 0px;
+  --ease: cubic-bezier(.2,.75,.2,1);
+}
+html { background: var(--cream); }
+body {
+  margin: 0;
+  background: linear-gradient(var(--cream) 0, var(--cream) 30%, var(--paper) 100%);
+  color: var(--ink); font: 400 16px/1.5 var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--moss); outline-offset: 3px; }
+
+/* Hero */
+.hero { position: relative; height: 100vh; height: 100svh; }
+.stage { position: absolute; inset: 0; overflow: hidden; }
+.stage svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.mark .bars { fill: var(--sand); }
+.mark .vee, .l { fill: var(--olive); }
+.rail { fill: none; stroke: var(--sand); stroke-width: 1.25; }
+#hits, .mini { display: none; }
+.hint {
+  position: absolute; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); width: 1px; height: 46px;
+  background: var(--sand-soft); overflow: hidden; transition: opacity .5s ease;
+}
+.hint::after {
+  content: ""; position: absolute; inset: 0; background: var(--olive);
+  animation: hint 2.2s var(--ease) infinite;
+}
+@keyframes hint { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
+
+/* Staircase of products */
+main {
+  max-width: 1180px; margin-inline: auto; overflow-x: clip;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.step {
+  position: relative;
+  margin-left: calc(var(--i) * var(--step));
+  padding: clamp(48px, 9vh, 96px) 0 clamp(56px, 11vh, 120px) clamp(18px, 3vw, 34px);
+  max-width: 840px;
+}
+.step::before, .tread { content: ""; position: absolute; background: var(--sand); }
+.step::before { left: 0; top: 0; bottom: 0; width: 1px; transform-origin: top; }
+.tread { left: calc(var(--step) * -1); top: 0; width: var(--step); height: 1px; transform-origin: left; }
+.step:first-child .tread { display: none; }
+
+.head {
+  display: flex; align-items: flex-start; gap: clamp(12px, 2vw, 24px);
+  margin: 0 0 clamp(24px, 4vh, 40px); font-weight: 400;
+}
+.big {
+  font: 400 clamp(6rem, 15vw, 11rem)/.86 var(--display); color: var(--olive); display: block;
+}
+.word {
+  display: flex; font: 400 clamp(1.3rem, 3.2vw, 2.4rem)/1 var(--display); color: var(--moss);
+  padding-top: .55em;
+}
+.word span { display: block; }
+
+.product { display: grid; gap: 20px; }
+.frame {
+  margin: 0; overflow: hidden; aspect-ratio: 1; max-width: 100%;
+  border-radius: 3px; background: var(--paper);
+  box-shadow: 0 1px 0 rgba(79,87,63,.14), 0 26px 50px -34px rgba(79,87,63,.55);
+}
+.frame img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 1.4s var(--ease); }
+.frame:hover img { transform: scale(1.04); }
+.side { display: grid; gap: 6px; justify-items: start; align-content: end; min-width: 0; }
+.side h3 { margin: 0; font: 400 1.5rem/1.2 var(--display); text-wrap: balance; }
+.side p { margin: 0 0 14px; color: var(--muted); }
+@media (min-width: 720px) {
+  .product { grid-template-columns: minmax(0, 1.6fr) minmax(190px, 1fr); gap: clamp(20px, 3vw, 40px); }
+}
+
+.buy {
+  display: inline-flex; align-items: stretch; padding: 0; border: 0; cursor: pointer; min-height: 54px;
+  border-radius: 3px; overflow: hidden; background: var(--moss); color: var(--cream);
+  font-weight: 500; font-variant-numeric: tabular-nums;
+  transition: transform .5s var(--ease), box-shadow .5s var(--ease);
+}
+.buy-label { display: flex; align-items: center; padding: 0 20px; min-width: 6.4em; justify-content: center; }
+.buy-price {
+  display: flex; align-items: center; padding: 0 18px; background: var(--sand); color: var(--ink); font-weight: 600;
+  transition: padding .5s var(--ease);
+}
+.buy:hover { transform: translateY(-2px); box-shadow: 0 14px 26px -14px rgba(51,57,42,.7); }
+.buy:hover .buy-price { padding-inline: 24px; }
+.buy:active { transform: translateY(0); }
+
+footer { background: var(--moss); color: var(--cream); }
+.foot {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; box-sizing: border-box; height: 100%; max-width: 1280px; margin-inline: auto;
+  padding-block: calc(clamp(16px, 3.4vh, 34px) + env(safe-area-inset-top, 0px)) calc(clamp(16px, 3.4vh, 34px) + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.f-logo { display: block; flex: none; width: min(64vw, 50vh, 460px); height: auto; }
+.f-bars { fill: var(--sand); }
+.f-word { fill: var(--cream); }
+.f-head { flex: none; margin: clamp(10px, 2.6vh, 26px) 0 0; text-align: center; font: 400 clamp(1.6rem, 4.6vh, 2.9rem)/1.1 var(--display); text-wrap: balance; }
+.f-intro { flex: none; margin: 8px 0 clamp(12px, 2.8vh, 28px); text-align: center; color: var(--sand-soft); font-size: clamp(.95rem, 2vh, 1.1rem); text-wrap: balance; }
+.f-bar {
+  flex: none; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: clamp(4px, 1vw, 12px);
+  width: 100%; max-width: 980px; margin: 0; padding: 0; list-style: none;
+}
+.f-item { display: grid; gap: 7px; min-width: 0; justify-items: center; }
+.f-card {
+  position: relative; display: block; width: 100%; height: clamp(92px, 25vh, 196px); padding: 0; border: 0; border-radius: 3px; overflow: hidden; cursor: pointer;
+  background: var(--paper); transition: transform .5s var(--ease), box-shadow .5s var(--ease);
+}
+.f-card:hover { transform: translateY(-6px); box-shadow: 0 16px 24px -14px rgba(0,0,0,.55); }
+.f-card:focus-visible { outline-color: var(--cream); outline-offset: 2px; }
+.f-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1s var(--ease); }
+.f-card:hover img { transform: scale(1.07); }
+.f-letter { position: absolute; left: 0; right: 0; top: 6px; text-align: center; font: 400 clamp(1.05rem, 2.8vw, 1.7rem)/1 var(--display); color: var(--moss); }
+.f-label { font: 400 .92rem/1.2 var(--display); color: var(--sand-soft); text-align: center; overflow-wrap: anywhere; }
+@media (max-width: 719px) { .f-label { display: none; } }
+
+.pc-back { position: fixed; inset: 0; z-index: 5; background: rgba(33,38,27,.62); }
+.pc-back[hidden], .pc[hidden] { display: none; }
+.pc {
+  position: fixed; inset: 0; z-index: 5; margin: auto; width: min(760px, calc(100% - 32px)); height: fit-content; max-height: calc(100% - 136px);
+  display: grid; overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; transform-origin: 0 0;
+  background: var(--cream); color: var(--ink); border-radius: 4px; box-shadow: 0 40px 70px -30px rgba(0,0,0,.6);
+}
+.pc-x { position: absolute; top: 8px; right: 8px; z-index: 1; border-radius: 50%; background: var(--cream); }
+.pc-media { aspect-ratio: 16 / 11; overflow: hidden; background: var(--paper); }
+.pc-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pc-body { display: grid; gap: 8px; justify-items: start; align-content: center; min-width: 0; padding: 20px 22px 24px; }
+.pc-head { display: flex; align-items: baseline; gap: 10px; }
+.pc-head b { font: 400 3rem/1 var(--display); color: var(--olive); }
+.pc-head span { font: 400 1.1rem/1.2 var(--display); color: var(--moss); }
+.pc h2 { margin: 0; font: 400 1.6rem/1.15 var(--display); text-wrap: balance; outline: none; }
+.pc-spec { margin: 0; color: var(--muted); }
+.pc-desc { margin: 4px 0 12px; line-height: 1.5; }
+@media (min-width: 720px) {
+  .pc { grid-template-columns: 1fr 1fr; }
+  .pc-media { aspect-ratio: 1; }
+  .pc-body { padding: 28px; }
+  .pc-head b { font-size: 4rem; }
+}
+/* the page enters piece by piece when it comes up */
+.js footer .f-logo, .js footer .f-head, .js footer .f-intro, .js footer .f-item { opacity: 0; transform: translateY(26px); }
+.js footer.in .f-logo, .js footer.in .f-head, .js footer.in .f-intro, .js footer.in .f-item {
+  opacity: 1; transform: none; transition: opacity .7s ease, transform .9s var(--ease), flex-grow .75s var(--ease);
+}
+.js footer.in .f-logo { transition-delay: .3s, .3s, 0s; }
+.js footer.in .f-head { transition-delay: .4s, .4s, 0s; }
+.js footer.in .f-intro { transition-delay: .48s, .48s, 0s; }
+.js footer.in .f-item { transition-delay: calc(.52s + var(--i) * 55ms), calc(.52s + var(--i) * 55ms), 0s; }
+
+/* Stage mode: one fixed screen, every piece placed by the script */
+html.js, .js body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+.js body { background: var(--cream); transition: background-color 1.2s ease; touch-action: none; }
+.js .hero, .js main { position: fixed; inset: 0; height: auto; max-width: none; margin: 0; padding: 0; overflow: hidden; }
+.js main { pointer-events: none; }
+.js #art { opacity: 0; transition: opacity .9s ease; }
+.js.ready #art { opacity: 1; }
+.js .step, .js .head { display: contents; }
+.js .big, .js .tread, .js .step::before { display: none; }
+.js .word, .js .frame, .js .side, .js footer { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform, opacity; }
+.js .word { margin: 0; padding: 0; white-space: nowrap; transition: color .4s ease; }
+.js .frame { aspect-ratio: auto; }
+.js .frame img { transition: transform 1s var(--ease); }
+.js .frame.lift img { transform: scale(1.1); }
+.js .word.lift { color: var(--olive); }
+.js .side { pointer-events: auto; align-content: start; }
+.js footer { position: fixed; right: 0; bottom: 0; pointer-events: auto; overflow: hidden; }
+
+.js #hits { display: block; position: fixed; inset: 0; pointer-events: none; }
+#hits button {
+  position: absolute; padding: 0; border: 0; background: none; cursor: pointer; pointer-events: auto; border-radius: 3px;
+}
+.js .mini {
+  display: flex; flex-direction: column; position: fixed; z-index: 4; left: 0; top: 0;
+  transform-origin: 0 0; will-change: transform, opacity;
+}
+.mini.off { pointer-events: none; }
+.mini button {
+  display: flex; align-items: center; gap: 10px; height: var(--row); padding: 0 12px 0 10px; border: 0; background: none;
+  cursor: pointer; text-align: left; color: var(--moss); border-left: 1px solid var(--sand-soft);
+  transition: border-color .2s ease, background-color .2s ease;
+}
+.mini b { width: 1.1em; font: 400 1.2rem/1 var(--display); color: var(--olive); }
+.mini img { width: calc(var(--row) - 10px); height: calc(var(--row) - 10px); object-fit: cover; border-radius: 3px; opacity: .72; transition: opacity .5s ease; }
+.mini span { font: 400 .95rem/1 var(--display); opacity: .72; transition: opacity .5s ease; }
+.mini button:hover img, .mini button:hover span, .mini button[aria-current="true"] img, .mini button[aria-current="true"] span { opacity: 1; }
+.mini button[aria-current="true"] { border-left-color: var(--moss); background: rgba(113,119,92,.1); }
+@media (max-width: 719px) {
+  .mini button { gap: 5px; padding: 0 6px; }
+  .mini b { font-size: 1rem; width: .9em; }
+  .mini span { display: none; }
+}
+
+.bag {
+  display: none; position: fixed; z-index: 6; width: 46px; height: 46px; padding: 0; border: 0; border-radius: 50%;
+  top: calc(12px + env(safe-area-inset-top, 0px)); right: max(14px, env(safe-area-inset-right, 0px));
+  background: var(--moss); color: var(--cream); cursor: pointer; align-items: center; justify-content: center;
+  transition: transform .4s var(--ease), background-color .6s ease, color .6s ease;
+}
+.js .bag { display: flex; }
+.bag.inv { background: var(--sand); color: var(--ink); }
+.bag.inv .bag-count { background: var(--cream); }
+.bag:hover { transform: scale(1.07); }
+.bag svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+.bag-count {
+  position: absolute; top: -3px; right: -3px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px;
+  background: var(--sand); color: var(--ink); transition: background-color .6s ease; font: 600 .75rem/20px var(--body); text-align: center; font-variant-numeric: tabular-nums;
+}
+.bag-count[hidden] { display: none; }
+.orb, .ghost, .ring { position: fixed; left: 0; top: 0; z-index: 7; pointer-events: none; }
+.orb { width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: var(--light-core); box-shadow: 0 0 10px 4px var(--light), 0 0 26px 10px var(--light-soft); }
+.ghost { width: 120px; height: 120px; margin: -60px 0 0 -60px; object-fit: cover; border-radius: 3px; }
+.ring { width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; border: 2px solid var(--light); box-shadow: 0 0 18px 4px var(--light-soft); }
+
+#drawer {
+  position: fixed; inset: 0 0 0 auto; margin: 0; width: min(430px, 100%); max-width: 100%; height: 100%; max-height: none;
+  padding: 0; border: 0; background: var(--cream); color: var(--ink); overflow: hidden; touch-action: pan-y;
+  transform: translateX(100%); transition: transform .55s var(--ease);
+  box-shadow: -30px 0 60px -40px rgba(51,57,42,.6);
+}
+#drawer.open { transform: none; }
+#drawer::backdrop { background: rgba(51,57,42,.28); }
+.d-in {
+  display: flex; flex-direction: column; height: 100%; box-sizing: border-box;
+  padding-block: calc(18px + env(safe-area-inset-top, 0px)) calc(18px + env(safe-area-inset-bottom, 0px));
+  padding-left: 22px; padding-right: max(22px, env(safe-area-inset-right, 0px));
+}
+.d-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 1px solid var(--sand-soft); }
+.d-head h2 { margin: 0; font: 400 1.6rem/1.2 var(--display); }
+.d-x { width: 40px; height: 40px; padding: 0; border: 0; background: none; cursor: pointer; font-size: 1.5rem; line-height: 1; color: var(--moss); }
+.d-list { flex: 1; min-height: 0; overflow-y: auto; margin: 0; padding: 0; list-style: none; overscroll-behavior: contain; }
+.d-empty { margin: 32px 0; color: var(--muted); }
+.d-row { display: grid; grid-template-columns: 68px minmax(0, 1fr) auto; gap: 4px 14px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--paper); }
+.d-row img { grid-row: span 2; width: 68px; height: 68px; object-fit: cover; border-radius: 3px; }
+.d-name { font: 400 1.05rem/1.2 var(--display); }
+.d-line { text-align: right; font-weight: 500; font-variant-numeric: tabular-nums; }
+.d-qty { display: inline-flex; align-items: center; gap: 2px; font-variant-numeric: tabular-nums; }
+.d-qty button { width: 30px; height: 30px; padding: 0; border: 1px solid var(--sand-soft); border-radius: 3px; background: none; cursor: pointer; color: var(--moss); font-size: 1.05rem; line-height: 1; }
+.d-qty button:hover { background: var(--paper); }
+.d-qty span { min-width: 28px; text-align: center; }
+.d-rm { justify-self: end; padding: 4px 0; border: 0; background: none; cursor: pointer; color: var(--muted); font-size: .85rem; text-decoration: underline; }
+.d-foot { display: grid; gap: 12px; padding-top: 16px; }
+.d-total { display: flex; justify-content: space-between; align-items: baseline; font: 400 1.3rem/1.2 var(--display); }
+.d-total b { font-weight: 400; font-variant-numeric: tabular-nums; }
+.d-pay { min-height: 54px; border: 0; border-radius: 3px; background: var(--moss); color: var(--cream); font-weight: 500; font-size: 1.02rem; cursor: pointer; font-variant-numeric: tabular-nums; transition: background-color .4s ease; }
+.d-pay:hover { background: var(--ink); }
+.d-pay:disabled { background: var(--sand-soft); color: var(--muted); cursor: default; }
+.d-note { margin: 0; color: var(--muted); font-size: .92rem; }
+
+#checkout {
+  position: fixed; inset: 0; margin: 0; width: 100%; max-width: 100%; height: 100%; max-height: none; box-sizing: border-box;
+  padding: 0; border: 0; background: var(--cream); color: var(--ink); overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain;
+  transform: translateY(100%); transition: transform .7s var(--ease);
+}
+#checkout.open { transform: none; }
+.co-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; max-width: 1040px; margin-inline: auto; box-sizing: border-box;
+  padding-block: calc(18px + env(safe-area-inset-top, 0px)) 14px;
+  padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+.co-top strong { font: 400 1.25rem/1 var(--display); letter-spacing: .2em; color: var(--olive); }
+.co-back { padding: 10px 0; border: 0; background: none; cursor: pointer; color: var(--muted); text-decoration: underline; font-size: .95rem; }
+.co-bar { height: 2px; background: var(--paper); }
+.co-bar span { display: block; height: 100%; width: 20%; background: var(--olive); transition: width .7s var(--ease); }
+.co-grid {
+  display: grid; gap: 40px; max-width: 1040px; margin-inline: auto; box-sizing: border-box;
+  padding-block: clamp(24px, 6vh, 56px) calc(40px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+@media (min-width: 860px) { .co-grid { grid-template-columns: minmax(0, 1fr) 290px; gap: 72px; } }
+#co-form { min-width: 0; max-width: 580px; }
+.co-count { margin: 0 0 6px; color: var(--muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
+.co-step { display: grid; gap: 18px; }
+.co-step[hidden] { display: none; }
+.co-step h2 { margin: 0; font: 400 clamp(2rem, 6vw, 3.1rem)/1.08 var(--display); color: var(--olive); text-wrap: balance; outline: none; }
+.co-sub { margin: -10px 0 8px; color: var(--muted); }
+.row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.row.r13 { grid-template-columns: minmax(84px, 1fr) minmax(0, 3fr); }
+.row.r12 { grid-template-columns: minmax(104px, 1fr) minmax(0, 2fr); }
+.f { display: grid; gap: 6px; min-width: 0; align-content: start; }
+.f label, .choice legend { font-weight: 500; font-size: .95rem; }
+.f em { font-style: normal; font-weight: 400; color: var(--muted); }
+.f input, .f select, .f textarea {
+  width: 100%; box-sizing: border-box; min-height: 52px; padding: 13px 14px; font: 400 16px/1.35 var(--body); color: var(--ink);
+  background: #FFFEFB; border: 1px solid var(--sand-soft); border-radius: 3px; transition: border-color .3s ease, box-shadow .3s ease;
+}
+.f textarea { resize: vertical; }
+.f input::placeholder, .f textarea::placeholder { color: #9B9A86; }
+.f input:focus, .f select:focus, .f textarea:focus, .f input:focus-visible { outline: none; border-color: var(--olive); box-shadow: 0 0 0 3px rgba(113,119,92,.16); }
+.f input:disabled { background: var(--paper); color: var(--muted); }
+.bad input, .bad textarea { border-color: var(--error); }
+.err { margin: 0; color: var(--error); font-size: .9rem; }
+.choice { margin: 0; padding: 0; border: 0; min-width: 0; }
+.choice legend { padding: 0 0 8px; }
+.chs { display: flex; flex-wrap: wrap; gap: 8px; }
+.ch { display: block; position: relative; flex: 0 1 auto; cursor: pointer; }
+.wide-ch .ch { flex: 1 1 200px; }
+.ch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.ch span {
+  display: flex; align-items: center; justify-content: center; min-height: 50px; padding: 8px 22px; box-sizing: border-box; text-align: center;
+  background: #FFFEFB; border: 1px solid var(--sand-soft); border-radius: 3px; transition: background-color .3s ease, color .3s ease, border-color .3s ease;
+}
+.wide-ch .ch span { min-height: 64px; font: 400 1.08rem/1.2 var(--display); }
+.ch:hover span { border-color: var(--olive); }
+.ch input:checked + span { background: var(--moss); border-color: var(--moss); color: var(--cream); }
+.ch input:focus-visible + span { outline: 2px solid var(--moss); outline-offset: 2px; }
+.more { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .5s var(--ease), opacity .4s ease; }
+.more.on { grid-template-rows: 1fr; opacity: 1; }
+.more-in { display: grid; gap: 18px; overflow: hidden; min-height: 0; padding: 3px; margin: -3px; }
+.tick { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+.tick input { width: 20px; height: 20px; margin: 1px 0 0; flex: none; accent-color: var(--moss); }
+.recap { display: grid; }
+.rc { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; padding: 14px 0; border-top: 1px solid var(--sand-soft); }
+.rc h3 { margin: 0; font: 400 1.05rem/1.3 var(--display); color: var(--olive); }
+.rc button { grid-column: 2; grid-row: 1; padding: 0; border: 0; background: none; cursor: pointer; color: var(--muted); text-decoration: underline; font-size: .9rem; }
+.rc p { grid-column: 1 / -1; margin: 0; overflow-wrap: anywhere; }
+.co-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 26px; }
+.co-prev { padding: 12px 0; border: 0; background: none; cursor: pointer; color: var(--muted); text-decoration: underline; }
+.co-prev[hidden] { display: none; }
+.co-next {
+  margin-left: auto; min-height: 54px; padding: 0 30px; border: 0; border-radius: 3px; background: var(--moss); color: var(--cream);
+  font-weight: 500; font-size: 1.02rem; cursor: pointer; transition: background-color .4s ease, transform .5s var(--ease);
+}
+.co-next:hover { background: var(--ink); transform: translateY(-2px); }
+#co-note { margin-top: 14px; }
+#co-note[hidden] { display: none; }
+.co-side { display: grid; gap: 26px; align-content: start; }
+.co-rail { display: none; margin: 0; padding: 0; list-style: none; }
+.co-rail button {
+  display: block; width: 100%; padding: 11px 14px; text-align: left; border: 0; border-left: 1px solid var(--sand-soft); background: none; cursor: pointer;
+  font: 400 1rem/1.2 var(--display); color: var(--moss); transition: border-color .5s ease, background-color .5s ease, opacity .5s ease;
+}
+.co-rail button:disabled { opacity: .5; cursor: default; }
+.co-rail button[aria-current="step"] { border-left-color: var(--moss); background: rgba(113,119,92,.1); }
+@media (min-width: 860px) { .co-rail { display: block; } .co-side { position: sticky; top: 24px; } }
+.co-sum { display: grid; gap: 12px; padding-top: 16px; border-top: 1px solid var(--sand-soft); }
+.co-sum ul { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.co-sum li { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: .92rem; font-variant-numeric: tabular-nums; }
+.co-sum img { width: 44px; height: 44px; object-fit: cover; border-radius: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hint::after { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<section class="hero" id="hero" aria-label="Vevrado">
+  <div class="stage" id="stage">
+    <svg id="art" viewBox="110 370 1040 540" role="img" aria-label="Logo Vevrado : un V entre deux disques d'haltère, au-dessus du nom">
+      <path class="rail" id="rail" pathLength="1" d="" stroke-dasharray="1" stroke-dashoffset="1"/>
+      <g class="mark" id="mark"><path class="bars" d="M413.0 466.8L408.8 467.8L405.8 469.2L400.5 474.0L397.8 478.8L396.8 483.2L396.8 640.2L397.8 644.0L399.8 648.0L403.8 652.2L407.0 654.5L410.0 655.8L413.8 656.5L424.5 656.8L430.5 655.5L435.0 653.0L437.5 651.0L440.2 648.0L441.8 644.8L443.0 640.0L443.0 484.0L442.0 479.0L439.2 474.0L436.8 471.5L432.8 468.8L428.8 467.0L425.5 466.5ZM829.2 466.8L825.0 467.5L821.5 469.0L817.0 473.0L814.2 477.2L813.0 480.5L812.2 484.2L812.5 640.8L813.8 644.8L816.2 649.2L818.8 651.8L823.0 654.5L825.8 655.8L829.2 656.5L841.2 656.5L847.2 655.0L851.5 652.5L855.8 648.0L857.5 644.2L858.8 639.0L858.8 484.8L858.0 479.8L856.2 475.8L851.8 470.8L846.8 467.8L842.8 466.8ZM359.2 507.0L355.8 508.0L351.2 510.8L348.0 514.8L346.0 520.2L346.0 600.5L348.8 606.8L350.2 608.5L354.0 611.2L358.5 613.0L370.2 613.0L374.5 612.0L377.5 610.2L380.8 606.8L382.8 601.2L382.8 519.5L382.0 516.2L380.0 512.5L376.2 509.0L373.5 507.8L370.0 507.0ZM885.5 507.0L880.5 508.2L878.2 509.8L874.8 513.8L873.2 517.0L872.8 519.5L872.8 601.0L873.5 604.2L875.8 608.2L879.0 611.0L883.5 612.8L885.5 613.0L896.8 613.0L902.5 610.5L905.5 608.0L908.0 604.0L909.5 599.2L909.2 519.5L908.2 516.2L906.5 513.2L903.2 510.0L901.2 508.8L896.8 507.0Z"/><path class="vee" d="M443.5 415.0L443.5 416.8L447.8 424.2L455.2 436.0L458.8 442.5L465.0 452.2L506.0 521.2L508.5 524.8L528.8 559.0L532.5 564.5L548.5 591.8L609.0 691.5L610.5 692.8L640.8 692.5L641.8 691.5L661.0 659.8L661.0 658.5L549.5 470.2L544.2 460.8L524.0 427.2L520.8 423.8L515.5 420.2L506.0 416.5L501.0 415.5L497.8 415.5L493.5 414.8L456.0 414.5ZM807.0 415.0L798.8 414.5L733.2 414.8L731.8 416.0L633.5 583.0L633.5 583.8L635.8 588.0L641.2 596.5L647.0 607.0L651.5 613.8L657.8 625.0L669.0 643.2L670.5 643.2L671.8 641.8L705.5 586.5L708.8 580.5L807.2 416.8Z"/></g>
+      <g class="l" data-x="159.8" data-y="745.8" data-w="108.2" data-h="113.5"><path d="M161.0 745.8L159.8 746.8L159.8 747.8L174.5 779.0L195.5 821.5L198.2 828.2L203.8 838.8L212.5 857.5L213.8 859.0L215.5 859.2L216.8 858.2L235.2 817.8L241.0 806.2L242.2 802.8L267.8 747.2L267.5 746.5L266.5 745.8L258.8 745.8L257.0 747.0L231.5 802.0L229.8 806.8L225.2 815.8L222.5 822.5L218.8 830.2L218.0 831.0L216.5 829.0L207.0 809.8L202.0 798.5L194.2 783.2L177.0 747.0L175.5 745.8Z" fill-rule="evenodd"/></g><g class="l" data-x="314.8" data-y="745.8" data-w="76.0" data-h="112.5"><path d="M315.2 746.2L314.8 747.0L315.0 857.2L315.8 858.0L317.0 858.2L389.5 858.0L390.5 856.2L390.2 849.5L388.8 848.5L331.5 848.5L331.0 848.0L331.0 807.0L331.5 806.5L377.2 806.2L378.2 805.0L378.2 798.5L377.2 797.0L376.2 796.8L331.8 796.8L331.0 796.0L331.0 755.8L332.0 755.0L389.0 755.0L389.8 754.5L390.2 752.8L389.8 746.5L388.2 745.8L316.5 745.8Z" fill-rule="evenodd"/></g><g class="l" data-x="426.5" data-y="745.8" data-w="107.2" data-h="113.2"><path d="M427.5 745.8L426.8 746.2L426.5 747.8L459.5 816.5L464.5 827.8L467.5 833.2L479.0 858.0L480.0 859.0L481.8 859.0L482.8 858.0L514.5 789.8L516.2 785.0L519.8 778.2L533.5 747.8L533.5 746.5L532.5 745.8L524.0 745.8L522.8 746.8L485.2 829.8L484.2 830.5L480.2 823.2L478.0 817.8L471.2 804.8L466.5 794.0L443.5 746.8L442.0 745.8Z" fill-rule="evenodd"/></g><g class="l" data-x="578.2" data-y="745.8" data-w="87.0" data-h="112.5"><path d="M579.0 746.2L578.5 747.2L578.2 756.5L578.5 857.5L579.8 858.2L592.2 858.2L593.5 858.0L594.2 857.0L594.8 812.8L595.2 812.2L613.2 812.0L615.0 812.2L616.0 813.2L646.8 857.5L647.8 858.0L654.0 858.2L664.2 858.0L665.0 857.2L664.2 855.2L653.0 840.2L632.5 811.0L633.0 810.0L642.2 807.0L649.5 802.5L654.2 798.0L657.0 794.2L658.5 791.2L660.2 786.2L661.0 782.2L661.0 775.2L659.0 767.2L655.2 760.5L650.8 755.8L646.0 752.2L639.2 749.0L631.5 746.8L624.2 745.8L580.0 745.8ZM594.5 755.8L595.2 755.0L622.0 755.0L629.2 756.5L631.8 757.5L636.2 760.5L640.5 765.2L642.5 769.0L644.2 777.0L644.2 780.5L643.2 786.0L641.8 790.2L639.5 794.0L636.2 797.2L632.5 800.0L629.2 801.5L623.5 803.0L594.8 803.0Z" fill-rule="evenodd"/></g><g class="l" data-x="701.8" data-y="745.0" data-w="112.2" data-h="113.2"><path d="M756.8 745.0L755.8 745.8L725.0 808.0L721.0 817.2L702.0 855.8L702.0 857.5L703.2 858.2L711.2 858.2L712.8 857.2L725.8 830.0L729.5 823.2L780.2 823.2L797.0 857.0L798.8 858.2L808.5 858.2L813.5 857.8L813.8 856.2L781.2 790.2L760.2 746.5L758.5 745.0ZM754.5 771.5L755.2 772.0L775.2 812.8L775.0 813.8L740.2 814.0L734.8 813.8L734.2 813.2L739.0 802.5Z" fill-rule="evenodd"/></g><g class="l" data-x="853.5" data-y="745.8" data-w="95.8" data-h="112.5"><path d="M854.2 746.0L853.5 747.0L853.8 857.5L855.0 858.2L888.0 858.2L901.5 857.2L907.2 856.0L913.2 854.0L919.5 851.2L924.5 848.2L930.2 843.8L939.5 833.8L944.5 824.5L948.0 814.0L949.0 808.2L949.0 796.0L948.0 790.0L945.0 780.0L941.5 773.0L936.2 765.8L931.2 760.8L926.0 756.5L916.8 751.2L910.2 748.8L902.2 746.8L893.5 745.8ZM870.2 755.0L893.2 755.2L899.5 756.2L906.8 758.5L913.5 762.2L920.5 768.2L925.5 775.5L929.2 784.0L931.8 794.0L932.0 805.5L930.8 814.0L927.5 823.5L925.2 828.0L922.0 832.8L916.0 839.0L909.5 843.5L903.5 846.2L894.5 848.5L870.2 848.5L869.5 847.8L869.2 762.8L869.5 755.5Z" fill-rule="evenodd"/></g><g class="l" data-x="983.2" data-y="744.8" data-w="116.2" data-h="114.5"><path d="M1033.8 745.0L1022.0 747.8L1013.0 751.8L1004.0 757.8L995.8 766.2L989.2 776.2L985.8 785.0L983.2 797.0L983.2 807.0L985.5 818.2L988.8 827.0L994.2 836.0L999.5 842.2L1002.8 845.2L1012.2 852.0L1021.8 856.2L1029.0 858.2L1033.8 859.0L1046.8 859.2L1058.0 857.0L1063.0 855.2L1070.2 851.8L1079.2 845.2L1085.8 838.8L1089.0 834.8L1092.5 829.2L1095.0 823.8L1097.2 817.2L1098.5 811.8L1099.2 805.5L1099.0 796.0L1097.2 787.0L1094.5 779.2L1091.5 773.5L1085.5 765.0L1080.0 759.5L1076.0 756.2L1070.8 752.8L1065.0 749.8L1056.8 746.8L1052.5 745.8L1044.2 744.8ZM1038.0 754.2L1045.5 754.2L1049.8 755.0L1054.5 756.5L1059.5 758.8L1067.0 764.0L1073.2 771.2L1078.5 780.8L1080.5 786.2L1082.5 796.8L1082.5 807.5L1081.5 813.0L1078.2 823.8L1075.8 829.0L1073.0 833.2L1066.2 840.8L1059.8 845.2L1055.0 847.5L1049.5 849.2L1043.2 850.0L1033.5 849.5L1029.2 848.2L1019.5 843.5L1013.8 838.5L1007.2 830.0L1004.2 824.0L1001.2 814.5L1000.0 805.5L1000.2 795.0L1002.2 785.5L1006.2 776.0L1010.8 769.0L1017.5 762.2L1022.8 758.8L1028.2 756.2Z" fill-rule="evenodd"/></g>
+    </svg>
+    <span class="hint" id="hint" aria-hidden="true"></span>
+  </div>
+</section>
+
+<main id="shop">
+  <article class="step" style="--i:0;--len:7" aria-labelledby="t0">
+    <span class="tread" aria-hidden="true"></span>
+    <h2 class="head" id="t0" aria-label="Volonté">
+      <span class="big" aria-hidden="true">V</span>
+      <span class="word" aria-hidden="true"><span style="--n:0">V</span><span style="--n:1">o</span><span style="--n:2">l</span><span style="--n:3">o</span><span style="--n:4">n</span><span style="--n:5">t</span><span style="--n:6">é</span></span>
+    </h2>
+    <div class="product">
+      <figure class="frame"><img src="img/volonte.webp" alt="Haltères hexagonaux" width="900" height="900" decoding="async"></figure>
+      <div class="side">
+        <h3>Haltères hexagonaux</h3>
+        <p>Paire, 10 kg</p>
+        <button class="buy" type="button" id="buy-volonte" data-price="59">
+          <span class="buy-label">Acheter</span><span class="buy-price">59&nbsp;€</span>
+        </button>
+      </div>
+    </div>
+  </article>
+  <article class="step" style="--i:1;--len:9" aria-labelledby="t1">
+    <span class="tread" aria-hidden="true"></span>
+    <h2 class="head" id="t1" aria-label="Endurance">
+      <span class="big" aria-hidden="true">E</span>
+      <span class="word" aria-hidden="true"><span style="--n:0">E</span><span style="--n:1">n</span><span style="--n:2">d</span><span style="--n:3">u</span><span style="--n:4">r</span><span style="--n:5">a</span><span style="--n:6">n</span><span style="--n:7">c</span><span style="--n:8">e</span></span>
+    </h2>
+    <div class="product">
+      <figure class="frame"><img src="img/endurance.webp" alt="Corde à sauter" width="900" height="900" decoding="async"></figure>
+      <div class="side">
+        <h3>Corde à sauter</h3>
+        <p>Câble réglable, 3 m</p>
+        <button class="buy" type="button" id="buy-endurance" data-price="24">
+          <span class="buy-label">Acheter</span><span class="buy-price">24&nbsp;€</span>
+        </button>
+      </div>
+    </div>
+  </article>
+  <article class="step" style="--i:2;--len:8" aria-labelledby="t2">
+    <span class="tread" aria-hidden="true"></span>
+    <h2 class="head" id="t2" aria-label="Victoire">
+      <span class="big" aria-hidden="true">V</span>
+      <span class="word" aria-hidden="true"><span style="--n:0">V</span><span style="--n:1">i</span><span style="--n:2">c</span><span style="--n:3">t</span><span style="--n:4">o</span><span style="--n:5">i</span><span style="--n:6">r</span><span style="--n:7">e</span></span>
+    </h2>
+    <div class="product">
+      <figure class="frame"><img src="img/victoire.webp" alt="Kettlebell" width="900" height="900" decoding="async"></figure>
+      <div class="side">
+        <h3>Kettlebell</h3>
+        <p>16 kg</p>
+        <button class="buy" type="button" id="buy-victoire" data-price="69">
+          <span class="buy-label">Acheter</span><span class="buy-price">69&nbsp;€</span>
+        </button>
+      </div>
+    </div>
+  </article>
+  <article class="step" style="--i:3;--len:10" aria-labelledby="t3">
+    <span class="tread" aria-hidden="true"></span>
+    <h2 class="head" id="t3" aria-label="Résistance">
+      <span class="big" aria-hidden="true">R</span>
+      <span class="word" aria-hidden="true"><span style="--n:0">R</span><span style="--n:1">é</span><span style="--n:2">s</span><span style="--n:3">i</span><span style="--n:4">s</span><span style="--n:5">t</span><span style="--n:6">a</span><span style="--n:7">n</span><span style="--n:8">c</span><span style="--n:9">e</span></span>
+    </h2>
+    <div class="product">
+      <figure class="frame"><img src="img/resistance.webp" alt="Bandes élastiques" width="900" height="900" decoding="async"></figure>
+      <div class="side">
+        <h3>Bandes élastiques</h3>
+        <p>Lot de 3 tensions</p>
+        <button class="buy" type="button" id="buy-resistance" data-price="29">
+          <span class="buy-label">Acheter</span><span class="buy-price">29&nbsp;€</span>
+        </button>
+      </div>
+    </div>
+  </article>
+  <article class="step" style="--i:4;--len:8" aria-labelledby="t4">
+    <span class="tread" aria-hidden="true"></span>
+    <h2 class="head" id="t4" aria-label="Ambition">
+      <span class="big" aria-hidden="true">A</span>
+      <span class="word" aria-hidden="true"><span style="--n:0">A</span><span style="--n:1">m</span><span style="--n:2">b</span><span style="--n:3">i</span><span style="--n:4">t</span><span style="--n:5">i</span><span style="--n:6">o</span><span style="--n:7">n</span></span>
+    </h2>
+    <div class="product">
+      <figure class="frame"><img src="img/ambition.webp" alt="Barre de traction" width="900" height="900" decoding="async"></figure>
+      <div class="side">
+        <h3>Barre de traction</h3>
+        <p>Fixation de porte</p>
+        <button class="buy" type="button" id="buy-ambition" data-price="49">
+          <span class="buy-label">Acheter</span><span class="buy-price">49&nbsp;€</span>
+        </button>
+      </div>
+    </div>
+  </article>
+  <article class="step" style="--i:5;--len:13" aria-labelledby="t5">
+    <span class="tread" aria-hidden="true"></span>
+    <h2 class="head" id="t5" aria-label="Détermination">
+      <span class="big" aria-hidden="true">D</span>
+      <span class="word" aria-hidden="true"><span style="--n:0">D</span><span style="--n:1">é</span><span style="--n:2">t</span><span style="--n:3">e</span><span style="--n:4">r</span><span style="--n:5">m</span><span style="--n:6">i</span><span style="--n:7">n</span><span style="--n:8">a</span><span style="--n:9">t</span><span style="--n:10">i</span><span style="--n:11">o</span><span style="--n:12">n</span></span>
+    </h2>
+    <div class="product">
+      <figure class="frame"><img src="img/determination.webp" alt="Gants d'entraînement" width="900" height="900" decoding="async"></figure>
+      <div class="side">
+        <h3>Gants d'entraînement</h3>
+        <p>Du S au XL</p>
+        <button class="buy" type="button" id="buy-determination" data-price="34">
+          <span class="buy-label">Acheter</span><span class="buy-price">34&nbsp;€</span>
+        </button>
+      </div>
+    </div>
+  </article>
+  <article class="step" style="--i:6;--len:8" aria-labelledby="t6">
+    <span class="tread" aria-hidden="true"></span>
+    <h2 class="head" id="t6" aria-label="Objectif">
+      <span class="big" aria-hidden="true">O</span>
+      <span class="word" aria-hidden="true"><span style="--n:0">O</span><span style="--n:1">b</span><span style="--n:2">j</span><span style="--n:3">e</span><span style="--n:4">c</span><span style="--n:5">t</span><span style="--n:6">i</span><span style="--n:7">f</span></span>
+    </h2>
+    <div class="product">
+      <figure class="frame"><img src="img/objectif.webp" alt="Medicine ball" width="900" height="900" decoding="async"></figure>
+      <div class="side">
+        <h3>Medicine ball</h3>
+        <p>6 kg</p>
+        <button class="buy" type="button" id="buy-objectif" data-price="44">
+          <span class="buy-label">Acheter</span><span class="buy-price">44&nbsp;€</span>
+        </button>
+      </div>
+    </div>
+  </article>
+</main>
+
+<div id="hits"><button type="button" id="go-volonte" aria-label="Volonté : Haltères hexagonaux"></button><button type="button" id="go-endurance" aria-label="Endurance : Corde à sauter"></button><button type="button" id="go-victoire" aria-label="Victoire : Kettlebell"></button><button type="button" id="go-resistance" aria-label="Résistance : Bandes élastiques"></button><button type="button" id="go-ambition" aria-label="Ambition : Barre de traction"></button><button type="button" id="go-determination" aria-label="Détermination : Gants d'entraînement"></button><button type="button" id="go-objectif" aria-label="Objectif : Medicine ball"></button></div>
+<nav class="mini off" id="mini" aria-label="Produits"><button type="button" id="mini-volonte" aria-label="Volonté : Haltères hexagonaux"><b>V</b><img src="img/volonte.webp" alt="" width="60" height="60" decoding="async"><span>Volonté</span></button><button type="button" id="mini-endurance" aria-label="Endurance : Corde à sauter"><b>E</b><img src="img/endurance.webp" alt="" width="60" height="60" decoding="async"><span>Endurance</span></button><button type="button" id="mini-victoire" aria-label="Victoire : Kettlebell"><b>V</b><img src="img/victoire.webp" alt="" width="60" height="60" decoding="async"><span>Victoire</span></button><button type="button" id="mini-resistance" aria-label="Résistance : Bandes élastiques"><b>R</b><img src="img/resistance.webp" alt="" width="60" height="60" decoding="async"><span>Résistance</span></button><button type="button" id="mini-ambition" aria-label="Ambition : Barre de traction"><b>A</b><img src="img/ambition.webp" alt="" width="60" height="60" decoding="async"><span>Ambition</span></button><button type="button" id="mini-determination" aria-label="Détermination : Gants d'entraînement"><b>D</b><img src="img/determination.webp" alt="" width="60" height="60" decoding="async"><span>Détermination</span></button><button type="button" id="mini-objectif" aria-label="Objectif : Medicine ball"><b>O</b><img src="img/objectif.webp" alt="" width="60" height="60" decoding="async"><span>Objectif</span></button></nav>
+<footer id="foot"><div class="foot">
+  <svg class="f-logo" viewBox="140 400 980 475" role="img" aria-label="Logo Vevrado">
+    <path class="f-bars" d="M413.0 466.8L408.8 467.8L405.8 469.2L400.5 474.0L397.8 478.8L396.8 483.2L396.8 640.2L397.8 644.0L399.8 648.0L403.8 652.2L407.0 654.5L410.0 655.8L413.8 656.5L424.5 656.8L430.5 655.5L435.0 653.0L437.5 651.0L440.2 648.0L441.8 644.8L443.0 640.0L443.0 484.0L442.0 479.0L439.2 474.0L436.8 471.5L432.8 468.8L428.8 467.0L425.5 466.5ZM829.2 466.8L825.0 467.5L821.5 469.0L817.0 473.0L814.2 477.2L813.0 480.5L812.2 484.2L812.5 640.8L813.8 644.8L816.2 649.2L818.8 651.8L823.0 654.5L825.8 655.8L829.2 656.5L841.2 656.5L847.2 655.0L851.5 652.5L855.8 648.0L857.5 644.2L858.8 639.0L858.8 484.8L858.0 479.8L856.2 475.8L851.8 470.8L846.8 467.8L842.8 466.8ZM359.2 507.0L355.8 508.0L351.2 510.8L348.0 514.8L346.0 520.2L346.0 600.5L348.8 606.8L350.2 608.5L354.0 611.2L358.5 613.0L370.2 613.0L374.5 612.0L377.5 610.2L380.8 606.8L382.8 601.2L382.8 519.5L382.0 516.2L380.0 512.5L376.2 509.0L373.5 507.8L370.0 507.0ZM885.5 507.0L880.5 508.2L878.2 509.8L874.8 513.8L873.2 517.0L872.8 519.5L872.8 601.0L873.5 604.2L875.8 608.2L879.0 611.0L883.5 612.8L885.5 613.0L896.8 613.0L902.5 610.5L905.5 608.0L908.0 604.0L909.5 599.2L909.2 519.5L908.2 516.2L906.5 513.2L903.2 510.0L901.2 508.8L896.8 507.0Z"/><path class="f-word" d="M443.5 415.0L443.5 416.8L447.8 424.2L455.2 436.0L458.8 442.5L465.0 452.2L506.0 521.2L508.5 524.8L528.8 559.0L532.5 564.5L548.5 591.8L609.0 691.5L610.5 692.8L640.8 692.5L641.8 691.5L661.0 659.8L661.0 658.5L549.5 470.2L544.2 460.8L524.0 427.2L520.8 423.8L515.5 420.2L506.0 416.5L501.0 415.5L497.8 415.5L493.5 414.8L456.0 414.5ZM807.0 415.0L798.8 414.5L733.2 414.8L731.8 416.0L633.5 583.0L633.5 583.8L635.8 588.0L641.2 596.5L647.0 607.0L651.5 613.8L657.8 625.0L669.0 643.2L670.5 643.2L671.8 641.8L705.5 586.5L708.8 580.5L807.2 416.8Z"/><g class="f-word"><path d="M161.0 745.8L159.8 746.8L159.8 747.8L174.5 779.0L195.5 821.5L198.2 828.2L203.8 838.8L212.5 857.5L213.8 859.0L215.5 859.2L216.8 858.2L235.2 817.8L241.0 806.2L242.2 802.8L267.8 747.2L267.5 746.5L266.5 745.8L258.8 745.8L257.0 747.0L231.5 802.0L229.8 806.8L225.2 815.8L222.5 822.5L218.8 830.2L218.0 831.0L216.5 829.0L207.0 809.8L202.0 798.5L194.2 783.2L177.0 747.0L175.5 745.8Z" fill-rule="evenodd"/><path d="M315.2 746.2L314.8 747.0L315.0 857.2L315.8 858.0L317.0 858.2L389.5 858.0L390.5 856.2L390.2 849.5L388.8 848.5L331.5 848.5L331.0 848.0L331.0 807.0L331.5 806.5L377.2 806.2L378.2 805.0L378.2 798.5L377.2 797.0L376.2 796.8L331.8 796.8L331.0 796.0L331.0 755.8L332.0 755.0L389.0 755.0L389.8 754.5L390.2 752.8L389.8 746.5L388.2 745.8L316.5 745.8Z" fill-rule="evenodd"/><path d="M427.5 745.8L426.8 746.2L426.5 747.8L459.5 816.5L464.5 827.8L467.5 833.2L479.0 858.0L480.0 859.0L481.8 859.0L482.8 858.0L514.5 789.8L516.2 785.0L519.8 778.2L533.5 747.8L533.5 746.5L532.5 745.8L524.0 745.8L522.8 746.8L485.2 829.8L484.2 830.5L480.2 823.2L478.0 817.8L471.2 804.8L466.5 794.0L443.5 746.8L442.0 745.8Z" fill-rule="evenodd"/><path d="M579.0 746.2L578.5 747.2L578.2 756.5L578.5 857.5L579.8 858.2L592.2 858.2L593.5 858.0L594.2 857.0L594.8 812.8L595.2 812.2L613.2 812.0L615.0 812.2L616.0 813.2L646.8 857.5L647.8 858.0L654.0 858.2L664.2 858.0L665.0 857.2L664.2 855.2L653.0 840.2L632.5 811.0L633.0 810.0L642.2 807.0L649.5 802.5L654.2 798.0L657.0 794.2L658.5 791.2L660.2 786.2L661.0 782.2L661.0 775.2L659.0 767.2L655.2 760.5L650.8 755.8L646.0 752.2L639.2 749.0L631.5 746.8L624.2 745.8L580.0 745.8ZM594.5 755.8L595.2 755.0L622.0 755.0L629.2 756.5L631.8 757.5L636.2 760.5L640.5 765.2L642.5 769.0L644.2 777.0L644.2 780.5L643.2 786.0L641.8 790.2L639.5 794.0L636.2 797.2L632.5 800.0L629.2 801.5L623.5 803.0L594.8 803.0Z" fill-rule="evenodd"/><path d="M756.8 745.0L755.8 745.8L725.0 808.0L721.0 817.2L702.0 855.8L702.0 857.5L703.2 858.2L711.2 858.2L712.8 857.2L725.8 830.0L729.5 823.2L780.2 823.2L797.0 857.0L798.8 858.2L808.5 858.2L813.5 857.8L813.8 856.2L781.2 790.2L760.2 746.5L758.5 745.0ZM754.5 771.5L755.2 772.0L775.2 812.8L775.0 813.8L740.2 814.0L734.8 813.8L734.2 813.2L739.0 802.5Z" fill-rule="evenodd"/><path d="M854.2 746.0L853.5 747.0L853.8 857.5L855.0 858.2L888.0 858.2L901.5 857.2L907.2 856.0L913.2 854.0L919.5 851.2L924.5 848.2L930.2 843.8L939.5 833.8L944.5 824.5L948.0 814.0L949.0 808.2L949.0 796.0L948.0 790.0L945.0 780.0L941.5 773.0L936.2 765.8L931.2 760.8L926.0 756.5L916.8 751.2L910.2 748.8L902.2 746.8L893.5 745.8ZM870.2 755.0L893.2 755.2L899.5 756.2L906.8 758.5L913.5 762.2L920.5 768.2L925.5 775.5L929.2 784.0L931.8 794.0L932.0 805.5L930.8 814.0L927.5 823.5L925.2 828.0L922.0 832.8L916.0 839.0L909.5 843.5L903.5 846.2L894.5 848.5L870.2 848.5L869.5 847.8L869.2 762.8L869.5 755.5Z" fill-rule="evenodd"/><path d="M1033.8 745.0L1022.0 747.8L1013.0 751.8L1004.0 757.8L995.8 766.2L989.2 776.2L985.8 785.0L983.2 797.0L983.2 807.0L985.5 818.2L988.8 827.0L994.2 836.0L999.5 842.2L1002.8 845.2L1012.2 852.0L1021.8 856.2L1029.0 858.2L1033.8 859.0L1046.8 859.2L1058.0 857.0L1063.0 855.2L1070.2 851.8L1079.2 845.2L1085.8 838.8L1089.0 834.8L1092.5 829.2L1095.0 823.8L1097.2 817.2L1098.5 811.8L1099.2 805.5L1099.0 796.0L1097.2 787.0L1094.5 779.2L1091.5 773.5L1085.5 765.0L1080.0 759.5L1076.0 756.2L1070.8 752.8L1065.0 749.8L1056.8 746.8L1052.5 745.8L1044.2 744.8ZM1038.0 754.2L1045.5 754.2L1049.8 755.0L1054.5 756.5L1059.5 758.8L1067.0 764.0L1073.2 771.2L1078.5 780.8L1080.5 786.2L1082.5 796.8L1082.5 807.5L1081.5 813.0L1078.2 823.8L1075.8 829.0L1073.0 833.2L1066.2 840.8L1059.8 845.2L1055.0 847.5L1049.5 849.2L1043.2 850.0L1033.5 849.5L1029.2 848.2L1019.5 843.5L1013.8 838.5L1007.2 830.0L1004.2 824.0L1001.2 814.5L1000.0 805.5L1000.2 795.0L1002.2 785.5L1006.2 776.0L1010.8 769.0L1017.5 762.2L1022.8 758.8L1028.2 756.2Z" fill-rule="evenodd"/></g>
+  </svg>
+  <h2 class="f-head">Quelle lettre te manque aujourd’hui ?</h2>
+  <p class="f-intro">Sept mots, sept outils. Prends celui qui te fera revenir demain.</p>
+  <ul class="f-bar" id="f-bar"><li class="f-item" style="--i:0"><button type="button" class="f-card" id="foot-volonte" aria-label="Volonté : Haltères hexagonaux, 59 euros" data-k="volonte" data-l="V" data-w="Volonté" data-n="Haltères hexagonaux" data-s="Paire, 10 kg" data-d="Le premier effort, celui que personne ne voit. Une paire de 10 kg qui t’attend chaque matin." data-p="59"><img src="img/volonte.webp" alt="" width="300" height="300" decoding="async"><span class="f-letter">V</span></button><span class="f-label">Volonté</span></li><li class="f-item" style="--i:1"><button type="button" class="f-card" id="foot-endurance" aria-label="Endurance : Corde à sauter, 24 euros" data-k="endurance" data-l="E" data-w="Endurance" data-n="Corde à sauter" data-s="Câble réglable, 3 m" data-d="Dix minutes, un câble, et ton souffle change. Le cardio qui tient dans un sac." data-p="24"><img src="img/endurance.webp" alt="" width="300" height="300" decoding="async"><span class="f-letter">E</span></button><span class="f-label">Endurance</span></li><li class="f-item" style="--i:2"><button type="button" class="f-card" id="foot-victoire" aria-label="Victoire : Kettlebell, 69 euros" data-k="victoire" data-l="V" data-w="Victoire" data-n="Kettlebell" data-s="16 kg" data-d="16 kg à soulever, et la sensation d’avoir gagné ta journée." data-p="69"><img src="img/victoire.webp" alt="" width="300" height="300" decoding="async"><span class="f-letter">V</span></button><span class="f-label">Victoire</span></li><li class="f-item" style="--i:3"><button type="button" class="f-card" id="foot-resistance" aria-label="Résistance : Bandes élastiques, 29 euros" data-k="resistance" data-l="R" data-w="Résistance" data-n="Bandes élastiques" data-s="Lot de 3 tensions" data-d="Trois tensions pour forcer partout, même dans ton salon." data-p="29"><img src="img/resistance.webp" alt="" width="300" height="300" decoding="async"><span class="f-letter">R</span></button><span class="f-label">Résistance</span></li><li class="f-item" style="--i:4"><button type="button" class="f-card" id="foot-ambition" aria-label="Ambition : Barre de traction, 49 euros" data-k="ambition" data-l="A" data-w="Ambition" data-n="Barre de traction" data-s="Fixation de porte" data-d="Elle se fixe à ta porte. Chaque passage devient une traction de plus." data-p="49"><img src="img/ambition.webp" alt="" width="300" height="300" decoding="async"><span class="f-letter">A</span></button><span class="f-label">Ambition</span></li><li class="f-item" style="--i:5"><button type="button" class="f-card" id="foot-determination" aria-label="Détermination : Gants d'entraînement, 34 euros" data-k="determination" data-l="D" data-w="Détermination" data-n="Gants d'entraînement" data-s="Du S au XL" data-d="Pour tenir la barre quand tes mains voudraient lâcher." data-p="34"><img src="img/determination.webp" alt="" width="300" height="300" decoding="async"><span class="f-letter">D</span></button><span class="f-label">Détermination</span></li><li class="f-item" style="--i:6"><button type="button" class="f-card" id="foot-objectif" aria-label="Objectif : Medicine ball, 44 euros" data-k="objectif" data-l="O" data-w="Objectif" data-n="Medicine ball" data-s="6 kg" data-d="6 kg à lancer, à porter, à gainer. Vise, et recommence." data-p="44"><img src="img/objectif.webp" alt="" width="300" height="300" decoding="async"><span class="f-letter">O</span></button><span class="f-label">Objectif</span></li></ul>
+</div></footer>
+<div class="pc-back" id="pc-back" hidden></div>
+<div class="pc" id="pc" role="dialog" aria-modal="true" aria-labelledby="pc-name" hidden>
+  <button class="d-x pc-x" type="button" id="pc-x" aria-label="Fermer la carte">&times;</button>
+  <div class="pc-media" id="pc-media"><img id="pc-img" alt=""></div>
+  <div class="pc-body">
+    <div class="pc-head"><b id="pc-l"></b><span id="pc-w"></span></div>
+    <h2 id="pc-name" tabindex="-1"></h2>
+    <p class="pc-spec" id="pc-s"></p>
+    <p class="pc-desc" id="pc-d"></p>
+    <button class="buy" type="button" id="pc-buy"><span class="buy-label">Acheter</span><span class="buy-price" id="pc-p"></span></button>
+  </div>
+</div>
+<button class="bag" type="button" id="bag" aria-label="Ouvrir le panier, 0 article">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l1 13H4L5 8Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg>
+  <span class="bag-count" id="bag-count">0</span>
+</button>
+<dialog id="drawer" aria-labelledby="d-title">
+  <div class="d-in">
+    <div class="d-head"><h2 id="d-title">Panier</h2><button class="d-x" type="button" id="d-close" aria-label="Fermer le panier">&times;</button></div>
+    <ul class="d-list" id="d-list"></ul>
+    <div class="d-foot">
+      <div class="d-total"><span>Total</span><b id="d-total">0&nbsp;€</b></div>
+      <button class="d-pay" type="button" id="d-pay">Payer</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="checkout" aria-label="Adresse de livraison">
+  <div class="co-top">
+    <strong>VEVRADO</strong>
+    <button type="button" class="co-back" id="co-cart">Retour au panier</button>
+  </div>
+  <div class="co-bar" aria-hidden="true"><span id="co-fill"></span></div>
+  <div class="co-grid">
+    <form id="co-form" novalidate>
+      <p class="co-count" id="co-count"></p>
+      <div id="co-steps"><section class="co-step" data-step="0"><h2 tabindex="-1">À qui on livre ?</h2><p class="co-sub">Pour que le livreur puisse te joindre.</p><div class="row"><div class="f "><label for="prenom">Prénom</label><input id="prenom" name="prenom" type="text" autocomplete="given-name" data-req="1" aria-describedby="prenom-err"><p class="err" id="prenom-err" hidden></p></div><div class="f "><label for="nom">Nom</label><input id="nom" name="nom" type="text" autocomplete="family-name" data-req="1" aria-describedby="nom-err"><p class="err" id="nom-err" hidden></p></div></div><div class="f "><label for="tel">Téléphone</label><input id="tel" name="tel" type="tel" autocomplete="tel" inputmode="tel" placeholder="06 12 34 56 78" data-req="1" aria-describedby="tel-err"><p class="err" id="tel-err" hidden></p></div><div class="f "><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="toi@exemple.fr" data-req="1" aria-describedby="email-err"><p class="err" id="email-err" hidden></p></div></section><section class="co-step" data-step="1" hidden><h2 tabindex="-1">Où ça ?</h2><p class="co-sub">Le numéro, la rue et la ville.</p><div class="f"><label for="pays">Pays</label><select id="pays" name="pays" autocomplete="country-name"><option>France</option><option>Belgique</option><option>Suisse</option><option>Luxembourg</option></select></div><div class="row r13"><div class="f "><label for="numero">Numéro</label><input id="numero" name="numero" type="text" autocomplete="off" placeholder="12 bis" data-req="1" aria-describedby="numero-err"><p class="err" id="numero-err" hidden></p></div><div class="f "><label for="rue">Rue</label><input id="rue" name="rue" type="text" autocomplete="address-line1" placeholder="rue des Lilas" data-req="1" aria-describedby="rue-err"><p class="err" id="rue-err" hidden></p></div></div><label class="tick"><input type="checkbox" id="sansnum" name="sansnum"><span>Mon adresse n’a pas de numéro</span></label><div class="f "><label for="lieu">Résidence, lieu-dit ou complément <em>si besoin</em></label><input id="lieu" name="lieu" type="text" autocomplete="address-line2" aria-describedby="lieu-err"><p class="err" id="lieu-err" hidden></p></div><div class="row r12"><div class="f "><label for="cp">Code postal</label><input id="cp" name="cp" type="text" autocomplete="postal-code" inputmode="numeric" data-req="1" aria-describedby="cp-err"><p class="err" id="cp-err" hidden></p></div><div class="f "><label for="ville">Ville</label><input id="ville" name="ville" type="text" autocomplete="address-level2" data-req="1" aria-describedby="ville-err"><p class="err" id="ville-err" hidden></p></div></div></section><section class="co-step" data-step="2" hidden><h2 tabindex="-1">Maison ou appartement ?</h2><p class="co-sub">Quelques détails pour trouver ta porte.</p><fieldset class="choice wide-ch" data-req="logement"><legend>Type de logement</legend><div class="chs"><label class="ch"><input type="radio" name="logement" id="logement-maison" value="maison"><span>Maison</span></label><label class="ch"><input type="radio" name="logement" id="logement-appart" value="appart"><span>Appartement</span></label></div><p class="err" id="logement-err" hidden></p></fieldset><div class="more" data-if="logement=maison"><div class="more-in"><div class="f "><label for="m-boite">Nom sur la boîte aux lettres</label><input id="m-boite" name="m-boite" type="text" autocomplete="off" placeholder="Martin" data-req="1" aria-describedby="m-boite-err"><p class="err" id="m-boite-err" hidden></p></div><fieldset class="choice" data-req="m-portail"><legend>Y a-t-il un portail avec un code ?</legend><div class="chs"><label class="ch"><input type="radio" name="m-portail" id="m-portail-non" value="non"><span>Non</span></label><label class="ch"><input type="radio" name="m-portail" id="m-portail-oui" value="oui"><span>Oui</span></label></div><p class="err" id="m-portail-err" hidden></p></fieldset><div class="more" data-if="m-portail=oui"><div class="more-in"><div class="f "><label for="m-code">Code du portail</label><input id="m-code" name="m-code" type="text" autocomplete="off" data-req="1" aria-describedby="m-code-err"><p class="err" id="m-code-err" hidden></p></div></div></div></div></div><div class="more" data-if="logement=appart"><div class="more-in"><div class="row"><div class="f "><label for="a-bat">Bâtiment <em>si besoin</em></label><input id="a-bat" name="a-bat" type="text" autocomplete="off" placeholder="B" aria-describedby="a-bat-err"><p class="err" id="a-bat-err" hidden></p></div><div class="f "><label for="a-esc">Escalier <em>si besoin</em></label><input id="a-esc" name="a-esc" type="text" autocomplete="off" aria-describedby="a-esc-err"><p class="err" id="a-esc-err" hidden></p></div></div><div class="row"><div class="f "><label for="a-etage">Étage</label><input id="a-etage" name="a-etage" type="text" autocomplete="off" placeholder="3 ou RDC" data-req="1" aria-describedby="a-etage-err"><p class="err" id="a-etage-err" hidden></p></div><div class="f "><label for="a-porte">N° d’appartement</label><input id="a-porte" name="a-porte" type="text" autocomplete="off" data-req="1" aria-describedby="a-porte-err"><p class="err" id="a-porte-err" hidden></p></div></div><div class="f "><label for="a-boite">Nom sur l’interphone ou la boîte</label><input id="a-boite" name="a-boite" type="text" autocomplete="off" placeholder="Martin" data-req="1" aria-describedby="a-boite-err"><p class="err" id="a-boite-err" hidden></p></div><fieldset class="choice" data-req="a-digi"><legend>Y a-t-il un digicode ?</legend><div class="chs"><label class="ch"><input type="radio" name="a-digi" id="a-digi-non" value="non"><span>Non</span></label><label class="ch"><input type="radio" name="a-digi" id="a-digi-oui" value="oui"><span>Oui</span></label></div><p class="err" id="a-digi-err" hidden></p></fieldset><div class="more" data-if="a-digi=oui"><div class="more-in"><div class="f "><label for="a-code">Digicode</label><input id="a-code" name="a-code" type="text" autocomplete="off" data-req="1" aria-describedby="a-code-err"><p class="err" id="a-code-err" hidden></p></div></div></div><fieldset class="choice" data-req="a-asc"><legend>Y a-t-il un ascenseur ?</legend><div class="chs"><label class="ch"><input type="radio" name="a-asc" id="a-asc-non" value="non"><span>Non</span></label><label class="ch"><input type="radio" name="a-asc" id="a-asc-oui" value="oui"><span>Oui</span></label></div><p class="err" id="a-asc-err" hidden></p></fieldset></div></div></section><section class="co-step" data-step="3" hidden><h2 tabindex="-1">Et si tu n’es pas là ?</h2><p class="co-sub">Pour que ton colis arrive du premier coup.</p><fieldset class="choice wide-ch" data-req="absent"><legend>Le livreur peut</legend><div class="chs"><label class="ch"><input type="radio" name="absent" id="absent-voisin" value="voisin"><span>Laisser chez un voisin</span></label><label class="ch"><input type="radio" name="absent" id="absent-gardien" value="gardien"><span>Laisser au gardien ou à l’accueil</span></label><label class="ch"><input type="radio" name="absent" id="absent-lieu" value="lieu"><span>Déposer dans un endroit sûr</span></label><label class="ch"><input type="radio" name="absent" id="absent-repasser" value="repasser"><span>Repasser un autre jour</span></label></div><p class="err" id="absent-err" hidden></p></fieldset><div class="f"><label for="repere">Un repère pour le livreur <em>si besoin</em></label><textarea id="repere" name="repere" rows="3" placeholder="Porte verte au fond de la cour"></textarea></div></section><section class="co-step" data-step="4" hidden><h2 tabindex="-1">Tout est bon ?</h2><p class="co-sub">Relis une dernière fois, puis on continue.</p><div class="recap" id="recap"></div><label class="tick"><input type="checkbox" id="ok" name="ok"><span>J’ai tout relu : cette adresse est complète et correcte.</span></label><p class="err" id="ok-err" hidden></p></section></div>
+      <div class="co-nav">
+        <button type="button" class="co-prev" id="co-prev">Retour</button>
+        <button type="submit" class="co-next" id="co-next">Continuer</button>
+      </div>
+      <p class="d-note" id="co-note" role="status" hidden>Ton adresse est complète. Le paiement en ligne n’est pas encore activé sur ce site.</p>
+    </form>
+    <aside class="co-side">
+      <ol class="co-rail" id="co-rail"><li><button type="button" id="co-to-0" disabled>Toi</button></li><li><button type="button" id="co-to-1" disabled>Adresse</button></li><li><button type="button" id="co-to-2" disabled>Logement</button></li><li><button type="button" id="co-to-3" disabled>Livraison</button></li><li><button type="button" id="co-to-4" disabled>Vérification</button></li></ol>
+      <div class="co-sum"><ul id="co-items"></ul><div class="d-total"><span>Total</span><b id="co-total"></b></div></div>
+    </aside>
+  </div>
+</dialog>
+<script>
+(function () {
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var root = document.documentElement;
+
+  /* Cart. Set CHECKOUT_URL once a payment provider is connected. */
+  var CHECKOUT_URL = '';
+  var bag = document.getElementById('bag'), badge = document.getElementById('bag-count'), dlg = document.getElementById('drawer'),
+      list = document.getElementById('d-list'), totalEl = document.getElementById('d-total'), pay = document.getElementById('d-pay');
+  var catalog = {}, cartItems = {};
+  try { cartItems = JSON.parse(localStorage.getItem('vevrado-cart')) || {}; } catch (e) { cartItems = {}; }
+
+  function cartCount() { return Object.keys(cartItems).reduce(function (n, k) { return n + cartItems[k]; }, 0); }
+  function showCount() {
+    var n = cartCount();
+    badge.textContent = n;
+    badge.hidden = !n;
+    bag.setAttribute('aria-label', 'Ouvrir le panier, ' + n + ' article' + (n > 1 ? 's' : ''));
+  }
+  function renderCart() {
+    var total = 0;
+    list.textContent = '';
+    Object.keys(cartItems).forEach(function (k) {
+      var it = catalog[k], q = cartItems[k];
+      if (!it) { return; }
+      total += it.price * q;
+      var li = document.createElement('li');
+      li.className = 'd-row';
+      li.innerHTML = '<img alt=""><span class="d-name"></span><span class="d-line"></span>' +
+        '<span class="d-qty"><button type="button" data-a="-1"></button><span></span><button type="button" data-a="1">+</button></span>' +
+        '<button class="d-rm" type="button" data-a="0">Retirer</button>';
+      li.querySelector('img').src = it.img;
+      li.querySelector('.d-name').textContent = it.name;
+      li.querySelector('.d-line').textContent = it.price * q + ' €';
+      li.querySelector('.d-qty span').textContent = q;
+      var minus = li.querySelector('[data-a="-1"]'), plus = li.querySelector('[data-a="1"]');
+      minus.textContent = '−';
+      minus.setAttribute('aria-label', 'Retirer un ' + it.name);
+      plus.setAttribute('aria-label', 'Ajouter un ' + it.name);
+      li.dataset.k = k;
+      list.appendChild(li);
+    });
+    if (!list.children.length) {
+      var e = document.createElement('li');
+      e.className = 'd-empty'; e.textContent = 'Ton panier est vide.';
+      list.appendChild(e);
+    }
+    totalEl.textContent = total + ' €';
+    pay.textContent = total ? 'Payer ' + total + ' €' : 'Payer';
+    pay.disabled = !total;
+    try { localStorage.setItem('vevrado-cart', JSON.stringify(cartItems)); } catch (e2) {}
+  }
+  list.addEventListener('click', function (e) {
+    var a = e.target.dataset && e.target.dataset.a, li = e.target.closest('.d-row');
+    if (a === undefined || !li) { return; }
+    var k = li.dataset.k;
+    cartItems[k] = a === '0' ? 0 : cartItems[k] + (+a);
+    if (cartItems[k] <= 0) { delete cartItems[k]; }
+    renderCart(); showCount();
+  });
+  function openCart() { renderCart(); dlg.showModal(); requestAnimationFrame(function () { requestAnimationFrame(function () { dlg.classList.add('open'); }); }); }
+  function closeCart() {
+    dlg.classList.remove('open');
+    setTimeout(function () { if (!dlg.classList.contains('open')) { dlg.close(); } }, 480);
+  }
+  bag.addEventListener('click', openCart);
+  document.getElementById('d-close').addEventListener('click', closeCart);
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) { closeCart(); } });
+  dlg.addEventListener('cancel', function (e) { e.preventDefault(); closeCart(); });
+
+  /* Delivery address: one short question at a time, nothing leaves the visitor's browser */
+  var co = document.getElementById('checkout'), form = document.getElementById('co-form'),
+      coSteps = [].slice.call(form.querySelectorAll('.co-step')), coRail = [].slice.call(document.querySelectorAll('#co-rail button')),
+      prev = document.getElementById('co-prev'), next = document.getElementById('co-next'), coNote = document.getElementById('co-note');
+  var step = 0, reached = 0, coBusy = false, ADDR_KEY = 'vevrado-adresse';
+  var POSTAL = { France: 5, Belgique: 4, Suisse: 4, Luxembourg: 4 };
+  function fv(id) { var el = form.elements[id]; return el ? String(el.value || '').trim() : ''; }
+  function isOn(el) { var m = el.closest('.more'); while (m) { if (!m.classList.contains('on')) { return false; } m = m.parentElement.closest('.more'); } return true; }
+
+  function setErr(host, id, msg) {
+    var e = document.getElementById(id + '-err');
+    if (e) { e.textContent = msg || ''; e.hidden = !msg; }
+    var box = host.closest('.f');
+    if (box) { box.classList.toggle('bad', !!msg); }
+    if (host.setAttribute) { host.setAttribute('aria-invalid', msg ? 'true' : 'false'); }
+  }
+  function checkField(el) {
+    var id = el.id, v = el.value.trim(), msg = '';
+    if (el.disabled) { setErr(el, id, ''); return true; }
+    var label = el.closest('.f').querySelector('label').firstChild.textContent.trim().toLowerCase();
+    if (el.dataset.req && !v) { msg = 'Indique ton ' + label + '.'; }
+    if (id === 'prenom' && !v) { msg = 'Indique ton prénom.'; }
+    if (id === 'rue' && !v) { msg = 'Indique le nom de ta rue.'; }
+    if (id === 'numero' && !v) { msg = 'Indique le numéro, ou coche la case en dessous.'; }
+    if (id === 'cp' && !v) { msg = 'Indique ton code postal.'; }
+    if (id === 'ville' && !v) { msg = 'Indique ta ville.'; }
+    if (id === 'a-etage' && !v) { msg = 'Indique ton étage, ou RDC.'; }
+    if (id === 'a-porte' && !v) { msg = 'Indique le numéro de ton appartement.'; }
+    if ((id === 'a-boite' || id === 'm-boite') && !v) { msg = 'Indique le nom écrit dessus.'; }
+    if ((id === 'a-code' || id === 'm-code') && !v) { msg = 'Indique le code pour que le livreur puisse entrer.'; }
+    if (id === 'tel' && v && v.replace(/[^0-9]/g, '').length < 9) { msg = 'Ce numéro semble trop court.'; }
+    if (id === 'email' && v && !/^[^ @]+@[^ @]+[.][^ @]+$/.test(v)) { msg = 'Cet e-mail semble incomplet, par exemple toi@exemple.fr.'; }
+    if (id === 'cp' && v) {
+      var want = POSTAL[fv('pays')];
+      if (v.replace(/[^0-9]/g, '').length !== want || /[^0-9 ]/.test(v)) { msg = 'En ' + fv('pays') + ', le code postal a ' + want + ' chiffres.'; }
+    }
+    setErr(el, id, msg);
+    return !msg;
+  }
+  function checkStep(i) {
+    var bad = null;
+    coSteps[i].querySelectorAll('input[data-req], [id="tel"], [id="email"]').forEach(function (el) {
+      if (isOn(el) && !checkField(el) && !bad) { bad = el; }
+    });
+    coSteps[i].querySelectorAll('fieldset[data-req]').forEach(function (fs) {
+      var name = fs.dataset.req;
+      if (!isOn(fs)) { return; }
+      var picked = fs.querySelector('input:checked');
+      setErr(fs, name, picked ? '' : 'Choisis une réponse.');
+      if (!picked && !bad) { bad = fs.querySelector('input'); }
+    });
+    if (i === coSteps.length - 1 && !form.elements.ok.checked) {
+      document.getElementById('ok-err').textContent = 'Coche cette case pour continuer.';
+      document.getElementById('ok-err').hidden = false;
+      bad = bad || form.elements.ok;
+    }
+    return bad;
+  }
+  function syncMore() {
+    form.querySelectorAll('.more').forEach(function (m) {
+      var q = m.dataset.if.split('='), el = form.querySelector('input[name="' + q[0] + '"]:checked'), on = !!el && el.value === q[1];
+      m.classList.toggle('on', on);
+      m.inert = !on;
+    });
+    var none = form.elements.sansnum.checked, num = form.elements.numero;
+    num.disabled = none;
+    if (none) { num.value = ''; setErr(num, 'numero', ''); }
+  }
+  function saveAddr() {
+    var d = {};
+    [].forEach.call(form.elements, function (el) {
+      if (!el.name || el.name === 'ok') { return; }
+      if (el.type === 'radio') { if (el.checked) { d[el.name] = el.value; } }
+      else if (el.type === 'checkbox') { d[el.name] = el.checked; }
+      else { d[el.name] = el.value; }
+    });
+    try { sessionStorage.setItem(ADDR_KEY, JSON.stringify(d)); } catch (e) {}
+  }
+  function loadAddr() {
+    var d = {};
+    try { d = JSON.parse(sessionStorage.getItem(ADDR_KEY)) || {}; } catch (e) {}
+    [].forEach.call(form.elements, function (el) {
+      if (!el.name || d[el.name] === undefined) { return; }
+      if (el.type === 'radio') { el.checked = d[el.name] === el.value; }
+      else if (el.type === 'checkbox') { el.checked = !!d[el.name]; }
+      else { el.value = d[el.name]; }
+    });
+  }
+  function radioLabel(name) {
+    var el = form.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.parentNode.textContent.trim() : '';
+  }
+  function buildRecap() {
+    var appart = radioLabel('logement') === 'Appartement', lines;
+    var sec = [
+      ['Toi', 0, [fv('prenom') + ' ' + fv('nom'), fv('tel'), fv('email')]],
+      ['Adresse', 1, [(form.elements.sansnum.checked ? '' : fv('numero') + ' ') + fv('rue'), fv('lieu'), fv('cp') + ' ' + fv('ville'), fv('pays')]]
+    ];
+    if (appart) {
+      lines = ['Appartement n° ' + fv('a-porte') + ', étage ' + fv('a-etage')];
+      if (fv('a-bat')) { lines.push('Bâtiment ' + fv('a-bat')); }
+      if (fv('a-esc')) { lines.push('Escalier ' + fv('a-esc')); }
+      lines.push('Nom : ' + fv('a-boite'));
+      lines.push(radioLabel('a-digi') === 'Oui' ? 'Digicode : ' + fv('a-code') : 'Pas de digicode');
+      lines.push(radioLabel('a-asc') === 'Oui' ? 'Avec ascenseur' : 'Sans ascenseur');
+    } else {
+      lines = ['Maison', 'Nom : ' + fv('m-boite'), radioLabel('m-portail') === 'Oui' ? 'Code du portail : ' + fv('m-code') : 'Pas de code de portail'];
+    }
+    sec.push(['Logement', 2, lines]);
+    sec.push(['Livraison', 3, ['Si tu es absent : ' + radioLabel('absent').toLowerCase(), fv('repere')]]);
+    var box = document.getElementById('recap');
+    box.textContent = '';
+    sec.forEach(function (x) {
+      var d = document.createElement('div'), h = document.createElement('h3'), b = document.createElement('button');
+      d.className = 'rc'; h.textContent = x[0]; b.type = 'button'; b.textContent = 'Modifier';
+      b.setAttribute('aria-label', 'Modifier : ' + x[0]);
+      b.addEventListener('click', function () { showStep(x[1]); });
+      d.appendChild(h); d.appendChild(b);
+      x[2].filter(Boolean).forEach(function (t) { var p = document.createElement('p'); p.textContent = t; d.appendChild(p); });
+      box.appendChild(d);
+    });
+  }
+  function paintStep() {
+    var n = coSteps.length;
+    document.getElementById('co-count').textContent = 'Étape ' + (step + 1) + ' sur ' + n;
+    document.getElementById('co-fill').style.width = ((step + 1) / n * 100) + '%';
+    prev.hidden = step === 0;
+    next.textContent = step === n - 1 ? 'Continuer vers le paiement' : 'Continuer';
+    coRail.forEach(function (b, i) {
+      b.disabled = i > reached;
+      if (i === step) { b.setAttribute('aria-current', 'step'); } else { b.removeAttribute('aria-current'); }
+    });
+    coNote.hidden = true;
+  }
+  function showStep(to) {
+    if (to === step || coBusy) { return; }
+    var from = coSteps[step], into = coSteps[to], dir = to > step ? 1 : -1;
+    coBusy = true;
+    if (to === coSteps.length - 1) { buildRecap(); form.elements.ok.checked = false; document.getElementById('ok-err').hidden = true; }
+    step = to; reached = Math.max(reached, to);
+    paintStep();
+    from.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(' + (-34 * dir) + 'px)' }], { duration: 240, easing: 'ease-in', fill: 'forwards' }).onfinish = function () {
+      from.hidden = true;
+      from.getAnimations().forEach(function (a) { a.cancel(); });
+      into.hidden = false;
+      co.scrollTo({ top: 0, behavior: 'smooth' });
+      into.animate([{ opacity: 0, transform: 'translateY(' + (44 * dir) + 'px)' }, { opacity: 1, transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.2,.75,.2,1)' });
+      coBusy = false;
+      focusStep();
+    };
+  }
+  function focusStep() {
+    var first = coSteps[step].querySelector('input:not([type="checkbox"]):not([type="radio"])');
+    if (first && matchMedia('(hover: hover)').matches && isOn(first)) { first.focus({ preventScroll: true }); }
+    else { coSteps[step].querySelector('h2').focus({ preventScroll: true }); }
+  }
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (coBusy) { return; }
+    syncMore();
+    var bad = checkStep(step);
+    if (bad) {
+      if (bad.type === 'radio' || bad.type === 'checkbox') { bad.focus({ preventScroll: true }); bad.closest('fieldset, .tick').scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+      else { bad.focus(); }
+      return;
+    }
+    if (step < coSteps.length - 1) { showStep(step + 1); return; }
+    saveAddr();
+    if (CHECKOUT_URL) { location.href = CHECKOUT_URL; return; }
+    coNote.hidden = false;
+  });
+  prev.addEventListener('click', function () { if (step > 0) { showStep(step - 1); } });
+  coRail.forEach(function (b, i) { b.addEventListener('click', function () { showStep(i); }); });
+  form.addEventListener('input', function (e) {
+    var el = e.target;
+    if (el.getAttribute && el.getAttribute('aria-invalid') === 'true' && el.closest('.f')) { checkField(el); }
+    saveAddr();
+  });
+  form.addEventListener('change', function (e) {
+    var el = e.target;
+    syncMore();
+    if (el.type === 'radio') { setErr(el.closest('fieldset'), el.name, ''); saveAddr(); }
+    if (el.id === 'ok' && el.checked) { document.getElementById('ok-err').hidden = true; }
+    if (el.id === 'pays' && fv('cp')) { checkField(form.elements.cp); }
+    if (el.id === 'sansnum') { saveAddr(); }
+  });
+  form.addEventListener('focusout', function (e) {
+    var el = e.target;
+    if (el.matches && el.matches('input[data-req], #tel, #email') && el.value.trim()) { checkField(el); }
+  });
+  function renderSummary() {
+    var ul = document.getElementById('co-items'), total = 0;
+    ul.textContent = '';
+    Object.keys(cartItems).forEach(function (k) {
+      var it = catalog[k], q = cartItems[k], li = document.createElement('li'), img = document.createElement('img'), n = document.createElement('span'), pr = document.createElement('span');
+      total += it.price * q;
+      img.src = it.img; img.alt = '';
+      n.textContent = (q > 1 ? q + ' × ' : '') + it.name; pr.textContent = it.price * q + ' €';
+      li.appendChild(img); li.appendChild(n); li.appendChild(pr); ul.appendChild(li);
+    });
+    document.getElementById('co-total').textContent = total + ' €';
+  }
+  function openCheckout() {
+    renderSummary(); syncMore(); paintStep();
+    co.showModal();
+    co.scrollTop = 0;
+    requestAnimationFrame(function () { requestAnimationFrame(function () { co.classList.add('open'); focusStep(); }); });
+  }
+  function closeCheckout(then) {
+    co.classList.remove('open');
+    setTimeout(function () { co.close(); if (then) { then(); } }, 560);
+  }
+  pay.addEventListener('click', function () {
+    dlg.classList.remove('open');
+    openCheckout();
+    setTimeout(function () { dlg.close(); }, 480);
+  });
+  document.getElementById('co-cart').addEventListener('click', function () { closeCheckout(openCart); });
+  co.addEventListener('cancel', function (e) { e.preventDefault(); closeCheckout(); });
+  loadAddr();
+
+  /* The article turns into a small light that flies into the bag */
+  function flyToBag(frame, done) {
+    var a = frame.getBoundingClientRect(), z = bag.getBoundingClientRect();
+    var sx = a.left + a.width / 2, sy = a.top + a.height / 2, ex = z.left + z.width / 2, ey = z.top + z.height / 2;
+    var cx = (sx + ex) / 2 + (ey - sy) * .22, cy = (sy + ey) / 2 - Math.abs(ex - sx) * .22;
+    var ghost = document.createElement('img');
+    ghost.className = 'ghost'; ghost.alt = ''; ghost.src = frame.querySelector('img').src;
+    ghost.style.transform = 'translate(' + sx + 'px,' + sy + 'px)';
+    document.body.appendChild(ghost);
+    ghost.animate([
+      { transform: 'translate(' + sx + 'px,' + sy + 'px) scale(1)', opacity: .95 },
+      { transform: 'translate(' + sx + 'px,' + sy + 'px) scale(.12)', opacity: 0 }
+    ], { duration: 240, easing: 'cubic-bezier(.5,0,.8,.4)', fill: 'both' }).onfinish = function () { ghost.remove(); };
+    var path = [];
+    for (var n = 0; n <= 18; n++) {
+      var t = n / 18, u = 1 - t, x = u * u * sx + 2 * u * t * cx + t * t * ex, y = u * u * sy + 2 * u * t * cy + t * t * ey;
+      path.push(t);
+      path[n] = { x: x, y: y, t: t };
+    }
+    [1, .68, .44, .26].forEach(function (size, i) {
+      var orb = document.createElement('span');
+      orb.className = 'orb'; orb.style.opacity = 0;
+      document.body.appendChild(orb);
+      var kf = path.map(function (q) {
+        return {
+          transform: 'translate(' + q.x.toFixed(1) + 'px,' + q.y.toFixed(1) + 'px) scale(' + (size * (q.t < .85 ? 1 : 1 - (q.t - .85) * 3)).toFixed(3) + ')',
+          opacity: q.t < .08 ? q.t / .08 : (i ? .8 - i * .15 : 1), offset: q.t
+        };
+      });
+      var an = orb.animate(kf, { duration: 560, delay: 150 + i * 38, easing: 'cubic-bezier(.45,.05,.3,1)', fill: 'both' });
+      an.onfinish = function () {
+        orb.remove();
+        if (i === 0) { land(ex, ey); done(); }
+      };
+    });
+  }
+  function land(x, y) {
+    var ring = document.createElement('span');
+    ring.className = 'ring';
+    document.body.appendChild(ring);
+    ring.animate([
+      { transform: 'translate(' + x + 'px,' + y + 'px) scale(.9)', opacity: 1 },
+      { transform: 'translate(' + x + 'px,' + y + 'px) scale(1.9)', opacity: 0 }
+    ], { duration: 460, easing: 'cubic-bezier(.2,.75,.2,1)' }).onfinish = function () { ring.remove(); };
+    bag.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.16)' }, { transform: 'scale(1)' }], { duration: 380, easing: 'ease-out' });
+    badge.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.45)' }, { transform: 'scale(1)' }], { duration: 380, easing: 'ease-out' });
+  }
+
+  function addToCart(k, source, label) {
+    cartItems[k] = (cartItems[k] || 0) + 1;
+    renderCart();
+    label.textContent = 'Ajouté';
+    clearTimeout(label.timer); label.timer = setTimeout(function () { label.textContent = 'Acheter'; }, 1400);
+    flyToBag(source, showCount);
+  }
+  document.querySelectorAll('.side .buy').forEach(function (b) {
+    var label = b.querySelector('.buy-label'), side = b.closest('.side'), frame = b.closest('.step').querySelector('.frame');
+    var k = b.id.replace('buy-', '');
+    catalog[k] = { name: side.querySelector('h3').textContent, price: +b.dataset.price, img: frame.querySelector('img').getAttribute('src') };
+    b.addEventListener('click', function () { addToCart(k, frame, label); });
+  });
+
+  /* End page: a slim tile opens into a full card */
+  var pc = document.getElementById('pc'), pcBack = document.getElementById('pc-back'), pcOpen = false, pcTile = null, pcKey = '', pcLock = false;
+  function fromTile(tile) {
+    var a = tile.getBoundingClientRect(), z = pc.getBoundingClientRect();
+    return 'translate(' + (a.left - z.left) + 'px,' + (a.top - z.top) + 'px) scale(' + (a.width / z.width) + ',' + (a.height / z.height) + ')';
+  }
+  function openCard(tile) {
+    if (pcOpen || pcLock) { return; }
+    var d = tile.dataset;
+    pcKey = d.k; pcTile = tile; pcOpen = true; pcLock = true;
+    document.getElementById('pc-img').src = catalog[d.k].img;
+    document.getElementById('pc-l').textContent = d.l;
+    document.getElementById('pc-w').textContent = d.w;
+    document.getElementById('pc-name').textContent = d.n;
+    document.getElementById('pc-s').textContent = d.s;
+    document.getElementById('pc-d').textContent = d.d;
+    document.getElementById('pc-p').innerHTML = d.p + '&nbsp;€';
+    pc.hidden = false; pcBack.hidden = false; pc.scrollTop = 0;
+    document.querySelector('footer').inert = true;
+    pcBack.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 420, easing: 'ease' });
+    pc.animate([{ transform: fromTile(tile), opacity: .5 }, { transform: 'none', opacity: 1 }],
+      { duration: 560, easing: 'cubic-bezier(.2,.75,.2,1)' }).onfinish = function () { pcLock = false; };
+    pc.querySelector('.pc-body').animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 0, transform: 'translateY(14px)', offset: .35 }, { opacity: 1, transform: 'none' }], { duration: 620, easing: 'ease-out' });
+    document.getElementById('pc-buy').focus({ preventScroll: true });
+  }
+  function closeCard() {
+    if (!pcOpen || pcLock) { return; }
+    pcLock = true;
+    pcBack.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 340, easing: 'ease', fill: 'forwards' });
+    pc.animate([{ transform: 'none', opacity: 1 }, { transform: fromTile(pcTile), opacity: .2 }], { duration: 360, easing: 'cubic-bezier(.5,0,.7,.3)', fill: 'forwards' }).onfinish = function () {
+      pc.hidden = true; pcBack.hidden = true;
+      pc.getAnimations().forEach(function (a) { a.cancel(); });
+      pcBack.getAnimations().forEach(function (a) { a.cancel(); });
+      document.querySelector('footer').inert = false;
+      pcOpen = false; pcLock = false;
+      pcTile.focus({ preventScroll: true });
+    };
+  }
+  document.getElementById('pc-x').addEventListener('click', closeCard);
+  pcBack.addEventListener('click', closeCard);
+  document.getElementById('pc-buy').addEventListener('click', function () {
+    addToCart(pcKey, document.getElementById('pc-media'), this.querySelector('.buy-label'));
+  });
+  Object.keys(cartItems).forEach(function (k) { if (!catalog[k]) { delete cartItems[k]; } });
+  showCount(); renderCart();
+
+  /* Stage: every state is a full layout; moving between states tweens each piece from where it is to where it belongs.
+     States: 0 logo, 1 staircase, 2-8 products, 9 footer. */
+  var $ = function (q) { return [].slice.call(document.querySelectorAll(q)); };
+  var stage = document.getElementById('stage'), art = document.getElementById('art'),
+      mark = document.getElementById('mark'), rail = document.getElementById('rail'), hint = document.getElementById('hint'),
+      mini = document.getElementById('mini'), foot = document.querySelector('footer');
+  var ls = $('.l'), words = $('.word'), frames = $('.frame'), sides = $('.side'), hits = $('#hits button'), minis = $('#mini button');
+  var LB = { x: 159, y: 414, w: 940, h: 446 }, N = 7, LAST = 9;
+  var W, H, G, state = 0, busy = false;
+
+  function clamp(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function ease(t) { return t < .5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2; }
+  function mix(a, b, q) { return a + (b - a) * q; }
+
+  function layout() {
+    W = stage.clientWidth; H = stage.clientHeight;
+    art.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    var wide = W >= 720;
+    /* logo */
+    var S0 = Math.min(W * .88 / LB.w, H * .78 / LB.h);
+    G = { S0: S0, OX: (W - LB.w * S0) / 2 - LB.x * S0, OY: (H - LB.h * S0) / 2 - LB.y * S0, stair: [], panel: [] };
+    /* staircase rows: letter, product, word */
+    var dy = Math.min(H * .86 / 7, 124), hL = wide ? dy * .62 : Math.min(dy * .6, W * .12), sS = hL / 112;
+    var thumb = wide ? dy * .84 : Math.min(dy * .84, W * .17);
+    var fs = wide ? Math.max(14, Math.min(dy * .3, 26)) : Math.max(13, Math.min(dy * .28, W * .042));
+    var gap = wide ? 18 : 12, lm = Math.max.apply(null, ls.map(function (g) { return +g.dataset.w; })) * sS;
+    var blockW = lm + gap * 2 + thumb + fs * 6.6;
+    var x0 = Math.max(24, (W - blockW) / 2), y0 = (H - 7 * dy) / 2;
+    /* pinned list at the right */
+    var row = Math.min((H - 132) / 7, wide ? 76 : 60);
+    mini.style.setProperty('--row', row + 'px');
+    var navW = mini.offsetWidth, navH = mini.offsetHeight;
+    G.nav = { x: W - navW - (wide ? 20 : 8), y: (H - navH) / 2, sx: x0 - 10, sy: y0, s: 7 * dy / navH };
+    /* product screens */
+    var box = wide ? Math.min(W - navW - 88, 1040) : W - navW - 34, top = wide ? H * .07 : Math.max(22, H * .04);
+    var lh = wide ? Math.min(H * .2, 150) : Math.min(H * .13, 96), sP = lh / 112, fP = wide ? Math.min(lh * .3, 38) : 24;
+    var imgTop = top + lh + H * .03;
+    ls.forEach(function (g, i) {
+      var lw = +g.dataset.w, x = x0, mid = y0 + (i + .5) * dy, tx = x + lm + gap;
+      G.stair[i] = { lx: x + (lm - lw * sS) / 2, ly: mid - hL / 2, ls: sS, fx: tx, fy: mid - thumb / 2, wx: tx + thumb + gap, wy: mid - fs * .6, wfs: fs, thumb: thumb };
+      var hit = hits[i].style;
+      hit.left = (x - 6) + 'px'; hit.top = (mid - dy / 2) + 'px'; hit.width = (blockW + 12 + fs) + 'px'; hit.height = dy + 'px';
+
+      var left = 16, size, sx, sy, sw, mg = Math.min(W * .03, 40);
+      if (wide) {
+        size = Math.min(H - imgTop - H * .06, box * .58); sw = Math.min(290, box - size - mg); left = (G.nav.x - size - mg - sw) / 2; sx = left + size + mg;
+        sides[i].style.width = sw + 'px'; sy = imgTop + size - sides[i].offsetHeight;
+      } else {
+        sides[i].style.width = box + 'px';
+        size = Math.min(box, H - imgTop - sides[i].offsetHeight - 28); sx = left; sy = imgTop + size + 14;
+      }
+      frames[i].style.width = frames[i].style.height = size + 'px';
+      words[i].style.fontSize = fP + 'px';
+      G.panel[i] = { lx: left, ly: top, ls: sP, fx: left, fy: imgTop, size: size, wx: left + lw * sP + (wide ? 22 : 14), wy: top + lh * .18, wfs: fP, sx: sx, sy: sy };
+    });
+    rail.setAttribute('d', 'M' + (x0 - 12) + ' ' + y0 + 'V' + (y0 + 7 * dy));
+    apply(state);
+  }
+
+  /* where everything belongs in a given state */
+  function pose(s) {
+    var isP = s >= 2, c = s === LAST ? N : s - 2, P = { L: [], F: [], Wd: [], Sd: [] };
+    for (var i = 0; i < N; i++) {
+      var a = G.stair[i], b = G.panel[i], ox = 0, oy = (i - c) * H, g = ls[i];
+      if (isP) {
+        P.L[i] = { x: b.lx + ox, y: b.ly + oy, s: b.ls, o: 1 };
+        P.F[i] = { x: b.fx + ox, y: b.fy + oy, s: 1, o: 1 };
+        P.Wd[i] = { x: b.wx + ox, y: b.wy + oy, s: 1, o: 1 };
+        P.Sd[i] = { x: b.sx + ox, y: b.sy + oy, s: 1, o: 1 };
+      } else {
+        P.L[i] = s === 0 ? { x: G.OX + g.dataset.x * G.S0, y: G.OY + g.dataset.y * G.S0, s: G.S0, o: 1 } : { x: a.lx, y: a.ly, s: a.ls, o: 1 };
+        P.F[i] = { x: a.fx, y: a.fy, s: a.thumb / b.size, o: s === 1 ? 1 : 0 };
+        P.Wd[i] = { x: a.wx, y: a.wy, s: a.wfs / b.wfs, o: s === 1 ? 1 : 0 };
+        P.Sd[i] = { x: b.sx, y: b.sy + 24, s: 1, o: 0 };
+      }
+    }
+    P.footY = s === LAST ? 0 : H + 2;
+    P.mark = s === 0 ? { y: 0, o: 1 } : { y: -H * .14, o: 0 };
+    P.rail = s === 1 ? 1 : 0;
+    P.nav = isP ? { x: G.nav.x, y: G.nav.y, s: 1, o: s === LAST ? 0 : 1 } : { x: G.nav.sx, y: G.nav.sy, s: G.nav.s, o: 0 };
+    return P;
+  }
+
+  function put(el, p) {
+    el.style.opacity = p.o;
+    el.style.transform = 'translate3d(' + p.x.toFixed(2) + 'px,' + p.y.toFixed(2) + 'px,0) scale(' + p.s.toFixed(4) + ')';
+  }
+  function putL(i, p) {
+    var g = ls[i];
+    g.style.opacity = p.o;
+    g.setAttribute('transform', 'translate(' + p.x.toFixed(2) + ' ' + p.y.toFixed(2) + ') scale(' + p.s.toFixed(4) + ') translate(' + (-g.dataset.x) + ' ' + (-g.dataset.y) + ')');
+  }
+  function putMark(p) {
+    mark.setAttribute('transform', 'translate(' + G.OX.toFixed(2) + ' ' + (G.OY + p.y).toFixed(2) + ') scale(' + G.S0.toFixed(4) + ')');
+    mark.style.opacity = p.o;
+  }
+  function putRail(v) {
+    rail.setAttribute('stroke-dashoffset', (1 - v).toFixed(4));
+    rail.style.opacity = v > .01 ? 1 : 0;
+  }
+  function draw(P) {
+    for (var i = 0; i < N; i++) { putL(i, P.L[i]); put(frames[i], P.F[i]); put(words[i], P.Wd[i]); put(sides[i], P.Sd[i]); }
+    foot.style.transform = 'translate3d(0,' + P.footY + 'px,0)';
+    putMark(P.mark); putRail(P.rail); put(mini, P.nav);
+  }
+  function markNav(s) {
+    bag.classList.toggle('inv', s === LAST);
+    foot.inert = s !== LAST;
+    foot.classList.toggle('in', s === LAST);
+    minis.forEach(function (m, i) { m.setAttribute('aria-current', s === i + 2 ? 'true' : 'false'); });
+  }
+  function settle(s) {
+    hits.forEach(function (h) { h.style.visibility = s === 1 ? 'visible' : 'hidden'; });
+    sides.forEach(function (el, i) { el.style.visibility = (s === i + 2) ? 'visible' : 'hidden'; });
+    mini.classList.toggle('off', s < 2 || s === LAST);
+    markNav(s);
+    hint.style.opacity = s === 0 ? 1 : 0;
+    document.body.style.backgroundColor = s >= 2 ? (s >= 6 ? '#EFE9DA' : '#F7F2E7') : '';
+  }
+  function apply(s) { draw(pose(s)); settle(s); }
+
+  function go(to) {
+    if (busy || to === state || to < 0 || to > LAST) { return; }
+    busy = true;
+    markNav(to);
+    var from = state, A = pose(from), B = pose(to), lane = from >= 2 && to >= 2, dist = Math.abs(to - from);
+    var morph = (from === 1 && to >= 2) ? to - 2 : (to === 1 && from >= 2) ? from - 2 : -1;
+    var opening = (from === 0 && to === 1) || (from === 1 && to === 0);
+    var D = (opening ? 1700 : morph >= 0 ? 1350 : 1150 + (dist - 1) * 320) * (reduce ? .6 : 1);
+    /* leaving or entering the staircase: products not concerned fade where they stand */
+    if (morph >= 0) {
+      for (var j = 0; j < N; j++) {
+        if (j === morph) { continue; }
+        var src = to === 1 ? B : A, dst = to === 1 ? A : B, sh = (j < morph ? -1 : 1) * 36;
+        ['L', 'F', 'Wd'].forEach(function (k) {
+          var p = src[k][j]; dst[k][j] = { x: p.x, y: p.y + sh, s: p.s, o: 0 };
+        });
+      }
+    }
+    sides.forEach(function (el) { el.style.visibility = 'visible'; });
+    hits.forEach(function (h) { h.style.visibility = 'hidden'; });
+    mini.classList.toggle('off', to < 2 || to === LAST);
+    hint.style.opacity = 0;
+    frames.concat(words).forEach(function (e) { e.classList.remove('lift'); });
+    function lerp(a, b, t, delay, walk) {
+      var span = 1 - delay - walk, qx = ease(clamp((t - delay) / span)), qy = ease(clamp((t - delay - walk) / span));
+      return { x: mix(a.x, b.x, qx), y: mix(a.y, b.y, qy), s: mix(a.s, b.s, qx), o: mix(a.o, b.o, a.o > b.o ? clamp(qx * 1.6) : clamp((qx - .3) / .7)) };
+    }
+    function frame(t) {
+      for (var i = 0; i < N; i++) {
+        var order = (to === 1 ? i : N - 1 - i) * .055;
+        if (opening) {
+          putL(i, lerp(A.L[i], B.L[i], t, order, .06));
+          put(frames[i], lerp(A.F[i], B.F[i], t, to === 1 ? .34 + i * .05 : 0, 0));
+          put(words[i], lerp(A.Wd[i], B.Wd[i], t, to === 1 ? .4 + i * .05 : 0, 0));
+        } else if (lane) {
+          putL(i, lerp(A.L[i], B.L[i], t, 0, .05));
+          put(words[i], lerp(A.Wd[i], B.Wd[i], t, .03, .05));
+          put(frames[i], lerp(A.F[i], B.F[i], t, .06, .05));
+        } else {
+          var dl = i === morph ? 0 : (to === 1 ? .35 : 0);
+          putL(i, lerp(A.L[i], B.L[i], t, dl, 0));
+          put(frames[i], lerp(A.F[i], B.F[i], t, dl, 0));
+          put(words[i], lerp(A.Wd[i], B.Wd[i], t, dl, 0));
+        }
+        put(sides[i], lerp(A.Sd[i], B.Sd[i], t, lane ? .1 : (to >= 2 ? .45 : 0), lane ? .05 : 0));
+      }
+      foot.style.transform = 'translate3d(0,' + mix(A.footY, B.footY, ease(t)).toFixed(1) + 'px,0)';
+      put(mini, lerp(A.nav, B.nav, t, 0, 0));
+      var qm = ease(clamp(t / .55));
+      putMark({ y: mix(A.mark.y, B.mark.y, qm), o: mix(A.mark.o, B.mark.o, qm) });
+      putRail(mix(A.rail, B.rail, ease(clamp(to === 1 ? (t - (opening ? .25 : .45)) / .55 : t / .4))));
+    }
+    var t0 = 0, done = false;
+    function finish() {
+      if (done) { return; }
+      done = true; state = to; apply(to);
+      setTimeout(function () { busy = false; }, 90);
+    }
+    function loop(now) {
+      if (done) { return; }
+      if (!t0) { t0 = now; }
+      var t = (now - t0) / D;
+      if (t >= 1) { finish(); return; }
+      frame(t); requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+    setTimeout(finish, D + 250);
+  }
+
+  /* wheel: one gesture, one step; trackpad inertia is ignored */
+  var lastT = 0, lastAbs = 0;
+  addEventListener('wheel', function (e) {
+    if (dlg.open || co.open) { return; }
+    e.preventDefault();
+    if (pcOpen) { return; }
+    var now = e.timeStamp, abs = Math.abs(e.deltaY), inertia = now - lastT < 160 && abs <= lastAbs;
+    lastT = now; lastAbs = abs;
+    if (inertia || abs < 4) { return; }
+    go(state + (e.deltaY > 0 ? 1 : -1));
+  }, { passive: false });
+
+  var ty = null;
+  addEventListener('touchstart', function (e) { ty = e.touches[0].clientY; }, { passive: true });
+  addEventListener('touchmove', function (e) { if (!dlg.open && !co.open && !e.target.closest('.pc')) { e.preventDefault(); } }, { passive: false });
+  addEventListener('touchend', function (e) {
+    if (ty === null || dlg.open || co.open || pcOpen) { ty = null; return; }
+    var d = ty - e.changedTouches[0].clientY; ty = null;
+    if (Math.abs(d) > 36) { go(state + (d > 0 ? 1 : -1)); }
+  }, { passive: true });
+
+  addEventListener('keydown', function (e) {
+    var k = e.key;
+    if (dlg.open || co.open) { return; }
+    if (pcOpen) { if (k === 'Escape') { closeCard(); } return; }
+    if (k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && e.target === document.body)) { e.preventDefault(); go(state + 1); }
+    if (k === 'ArrowUp' || k === 'PageUp') { e.preventDefault(); go(state - 1); }
+  });
+
+  hits.forEach(function (h, i) {
+    h.addEventListener('click', function () { go(i + 2); });
+    h.addEventListener('mouseenter', function () { frames[i].classList.add('lift'); words[i].classList.add('lift'); });
+    h.addEventListener('mouseleave', function () { frames[i].classList.remove('lift'); words[i].classList.remove('lift'); });
+  });
+  minis.forEach(function (m, i) { m.addEventListener('click', function () { go(i + 2); }); });
+  $('.f-card').forEach(function (c) { c.addEventListener('click', function () { openCard(c); }); });
+
+  addEventListener('resize', layout);
+  layout();
+  requestAnimationFrame(function () { root.classList.add('ready'); });
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(layout); }
+})();
+</script>
+</body>
+</html>
